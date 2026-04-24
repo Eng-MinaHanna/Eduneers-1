@@ -1277,24 +1277,9 @@
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('show'); }
         function logout() {
-            // مسح بيانات الجلسة فقط والحفاظ على الإعدادات
-            const keysToKeep = ['darkMode', 'PERSONAL_LINKS_MAP', 'PERSONAL_API'];
-            // نحتفظ أيضاً بروابط الجروبات
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key.startsWith('GROUP_API_')) keysToKeep.push(key);
-            }
-
-            const backup = {};
-            keysToKeep.forEach(k => backup[k] = localStorage.getItem(k));
-
+            // Clear session and reload to show login
             localStorage.clear();
-
-            Object.keys(backup).forEach(k => {
-                if (backup[k] !== null) localStorage.setItem(k, backup[k]);
-            });
-
-            window.location.href = 'index.html';
+            window.location.reload();
         }
 
         function fillGroupSelects() {
