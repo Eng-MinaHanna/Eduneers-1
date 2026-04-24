@@ -1737,6 +1737,11 @@ function submitData() {
         
         function renderAttendList() {
             const tbody = document.getElementById('attendListBody');
+            
+            const fl = parseInt(document.getElementById('attendFrom').value || 1);
+            const tl = parseInt(document.getElementById('attendTo').value || 10);
+            const totalLec = tl - fl + 1;
+            
             if (!allAttendList.length) {
                 tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px;">لا توجد بيانات</td></tr>';
                 return;
@@ -1745,11 +1750,19 @@ function submitData() {
             let html = '';
             allAttendList.forEach(s => {
                 const present = s.total || 0;
-                const badge = present >= 13 ? '#10b981' : present >= 10 ? '#f59e0b' : '#ef4444';
+                const absent = totalLec - present;
+                const statusColor = present >= (totalLec * 0.8) ? '#10b981' : present >= (totalLec * 0.5) ? '#f59e0b' : '#ef4444';
+                const statusText = present >= (totalLec * 0.8) ? 'ممتاز' : present >= (totalLec * 0.5) ? 'ضعيف' : 'غياب';
+                
                 html += `<tr>
                     <td style="font-weight:800; font-family:monospace;">${s.id}</td>
                     <td style="font-weight:600;">${s.name || '-'}</td>
-                    <td><span style="background:${badge}; color:#fff; padding:5px 12px; border-radius:20px; font-weight:800;">${present}</span></td>
+                    <td>
+                        <div style="display:flex; justify-content:center; gap:8px; align-items:center;">
+                            <span style="background:#10b981; color:#fff; padding:4px 10px; border-radius:15px; font-weight:800;">✓ ${present}</span>
+                            <span style="background:#ef4444; color:#fff; padding:4px 10px; border-radius:15px; font-weight:800;">✕ ${absent}</span>
+                        </div>
+                    </td>
                 </tr>`;
             });
             tbody.innerHTML = html;
