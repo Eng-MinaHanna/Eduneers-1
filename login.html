@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Eduneers | تسجيل الدخول</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <style>
+        /* Base Reset & Variables */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary: #0f172a;
+            --accent: #f5b041;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --error-color: #ef4444;
+            --success-color: #10b981;
+            --card-bg: #ffffff;
+            --bg-gradient: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            --electric-blue: #00d2ff;
+        }
+
+        /* Dark Mode Support (Defaulting to dark mode as per original code preference) */
+        body.dark-mode {
+            --primary: #f8fafc;
+            --text-main: #f8fafc;
+            --text-muted: #cbd5e1;
+            --border-color: #334155;
+            --card-bg: rgba(15, 23, 42, 0.9);
+            --bg-gradient: radial-gradient(circle at top right, #1e293b 0%, #0f172a 100%);
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-main);
+            transition: background 0.5s, color 0.5s;
+        }
+
+        /* Circuit Background Animation */
+        .circuit-bg {
+            position: fixed;
+            top: -5%;
+            left: -5%;
+            width: 110vw;
+            height: 110vh;
+            z-index: -1;
+            background-image: radial-gradient(circle at 50% 50%, rgba(245, 176, 65, 0.05) 2px, transparent 2px);
+            background-size: 40px 40px;
+            animation: pulseCircuit 12s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+            pointer-events: none;
+        }
+
+        body.dark-mode .circuit-bg {
+            background-image: radial-gradient(circle at 50% 50%, rgba(0, 210, 255, 0.1) 2px, transparent 3px);
+        }
+
+        @keyframes pulseCircuit {
+            0% { opacity: 0.3; transform: scale(1); }
+            100% { opacity: 0.8; transform: scale(1.05); }
+        }
+
+        /* Login Container Styles */
+        .login-wrapper {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            z-index: 10;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Logos */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-light, .logo-dark {
+            max-width: 150px;
+            height: auto;
+            margin-bottom: 15px;
+            transition: 0.3s;
+        }
+
+        .logo-dark { display: none; }
+        body.dark-mode .logo-light { display: none; }
+        body.dark-mode .logo-dark { display: inline-block; }
+
+        .login-card h2 {
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .login-subtitle {
+            color: var(--text-muted);
+            font-size: 15px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Form Inputs */
+        input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            border: 2px solid transparent;
+            background-color: rgba(0, 0, 0, 0.03);
+            color: var(--text-main);
+            font-size: 15px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            text-align: center;
+            font-family: 'Cairo', sans-serif;
+            transition: 0.3s;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--accent);
+            background: #fff;
+            box-shadow: 0 0 8px rgba(245, 176, 65, 0.2);
+        }
+
+        input::placeholder { color: var(--text-muted); }
+
+        body.dark-mode input {
+            background-color: #1e293b;
+            color: #fff;
+            border: 1px solid var(--border-color);
+        }
+        
+        body.dark-mode input:focus {
+            border-color: var(--electric-blue);
+            background-color: #0f172a;
+            box-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+        }
+
+        /* Submit Button */
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            border-radius: 14px;
+            border: none;
+            background: var(--accent);
+            color: #0f172a;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.1);
+            font-family: 'Cairo', sans-serif;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary:active { transform: scale(0.96); }
+
+        /* Divider */
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .divider hr {
+            border: none;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode .divider hr { border-top-color: rgba(255, 255, 255, 0.1); }
+
+        .divider span {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--card-bg);
+            padding: 0 20px;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        body.dark-mode .divider span {
+            background: #0f172a;
+            color: var(--electric-blue);
+            border-color: rgba(0, 210, 255, 0.2);
+        }
+
+        /* Google Login Container */
+        .google-btn-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(248, 250, 252, 0.5);
+            border-radius: 20px;
+            border: 2px dashed rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode .google-btn-container {
+            background: rgba(30, 41, 59, 0.5);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Electric Loader */
+        #electricLoader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 9999;
+            color: var(--text-main);
+        }
+        
+        body.dark-mode #electricLoader { color: var(--electric-blue); }
+
+        .loader-text {
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 700;
+            animation: pulseText 1.5s infinite alternate;
+        }
+
+        @keyframes pulseText { 0% { opacity: 0.7; } 100% { opacity: 1; } }
+
+        .progress-bar-container {
+            width: 80%;
+            max-width: 400px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            transition: width 0.1s linear;
+        }
+        
+        body.dark-mode .progress-bar-fill { background: var(--electric-blue); }
+
+        /* Toast Notifications */
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 14px 25px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 700;
+            display: none;
+            z-index: 3000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            from { transform: translate(-50%, 20px); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+
+        /* Theme Toggle Button (Optional, for login page) */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body class="dark-mode">
+
+    <div class="circuit-bg"></div>
+    
+    <button class="theme-toggle" id="themeToggle" onclick="toggleDarkMode()">☀️</button>
+
+    <div id="electricLoader">
+        <div class="loader-text" id="loaderMessage">جاري التحقق من الهوية...</div>
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="progressBarFill"></div>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <div class="login-wrapper">
+        <div class="login-card">
+            
+            <div class="logo-container">
+                <img src="https://aawyndbhkgiombfqinyf.supabase.co/storage/v1/object/public/new/BIM%20sesion%20(2).png" alt="Eduneers Logo" class="logo-light">
+                <img src="https://aawyndbhkgiombfqinyf.supabase.co/storage/v1/object/public/new/BIM%20sesion%20(4).png" alt="Eduneers Logo" class="logo-dark">
+                <h2>تسجيل الدخول</h2>
+                <p class="login-subtitle">Attendance System | Eduneers</p>
+            </div>
+
+            <input type="email" id="loginEmail" placeholder="البريد الإلكتروني..." autocomplete="email">
+            <input type="password" id="loginPassword" placeholder="كلمة المرور..." autocomplete="current-password">
+            <button class="btn-primary" onclick="handleManualLogin()">دخول آمن 🔐</button>
+
+            <div class="divider">
+                <hr><span>أو باستخدام</span>
+            </div>
+
+            <div class="google-btn-container" id="googleBtnWrapper"></div>
+            
+        </div>
+    </div>
+
+    <script>
+        const LOGIN_API_URL = "https://script.google.com/macros/s/AKfycbw-oytOWrgERm2yXu-NagMlyS14HlUGeAlsWqrZl2SwRJIi0IDL1AH2VduQvsmIIkNgFA/exec";
+        
+        // Setup Theme
+        if (localStorage.getItem('darkMode') === 'false') {
+            document.body.classList.remove('dark-mode');
+            document.getElementById('themeToggle').innerText = '🌙';
+        } else {
+            // Default to dark mode if not set or set to true
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeToggle').innerText = '☀️';
+            localStorage.setItem('darkMode', 'true');
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+            document.getElementById('themeToggle').innerText = isDark ? '☀️' : '🌙';
+        }
+
+        // UI Helpers
+        let loaderInterval;
+        function showProgress(message = "جاري العمل...") {
+            const l = document.getElementById('electricLoader');
+            document.getElementById('loaderMessage').innerText = message;
+            l.style.display = 'flex';
+            let p = 0; 
+            document.getElementById('progressBarFill').style.width = p + '%';
+            clearInterval(loaderInterval);
+            loaderInterval = setInterval(() => { 
+                p += Math.floor(Math.random() * 10) + 1; 
+                if (p > 90) p = 90; 
+                document.getElementById('progressBarFill').style.width = p + '%'; 
+            }, 100);
+        }
+
+        function completeProgress() {
+            clearInterval(loaderInterval);
+            document.getElementById('progressBarFill').style.width = '100%';
+            setTimeout(() => { 
+                document.getElementById('electricLoader').style.display = 'none'; 
+                document.getElementById('progressBarFill').style.width = '0%'; 
+            }, 300);
+        }
+
+        function showToast(text, type = "success") {
+            const t = document.getElementById('toast'); 
+            t.innerText = text;
+            t.style.background = type === "success" ? "linear-gradient(135deg, #10b981, #059669)" : "linear-gradient(135deg, #ef4444, #dc2626)";
+            t.style.display = 'block'; 
+            setTimeout(() => { t.style.display = 'none'; }, 4000);
+        }
+
+        // Login Functions
+        function handleManualLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const pass = document.getElementById('loginPassword').value.trim();
+            
+            if (!email || !pass) {
+                showToast("الرجاء إدخال الإيميل وكلمة المرور.", "error");
+                return;
+            }
+            
+            showProgress("جاري التحقق من الهوية وفتح قناة اتصال مشفرة 🔐...");
+            
+            fetch(`${LOGIN_API_URL}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}`)
+                .then(r => r.json())
+                .then(d => {
+                    completeProgress();
+                    if (d.status === 'success') {
+                        saveSessionAndRedirect(d, email);
+                    } else {
+                        showToast(d.message || "بيانات غير صحيحة", "error");
+                    }
+                })
+                .catch(e => {
+                    completeProgress();
+                    console.error("Login error:", e);
+                    showToast("❌ خطأ في الاتصال بالسيرفر المركزي.", "error");
+                });
+        }
+
+        // Google Login
+        window.onload = function() {
+            if (typeof google !== 'undefined' && google.accounts) {
+                google.accounts.id.initialize({
+                    client_id: "199540075185-0s74k90bdpodvtnao1ce7euec2o0vr31.apps.googleusercontent.com",
+                    callback: handleGoogleLogin,
+                    cancel_on_tap_outside: false
+                });
+                google.accounts.id.renderButton(
+                    document.getElementById("googleBtnWrapper"),
+                    { theme: document.body.classList.contains('dark-mode') ? "filled_black" : "outline", size: "large", shape: "pill", text: "signin_with" }
+                );
+            }
+
+            // Keyboard support
+            document.getElementById('loginPassword').addEventListener('keydown', e => { if (e.key === 'Enter') handleManualLogin(); });
+            document.getElementById('loginEmail').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('loginPassword').focus(); });
+        };
+
+        function parseJwt(token) {
+            try {
+                var b = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+                return JSON.parse(decodeURIComponent(atob(b).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+            } catch(e) {
+                return null;
+            }
+        }
+
+        function handleGoogleLogin(res) {
+            const payload = parseJwt(res.credential);
+            if (!payload) {
+                showToast("خطأ في قراءة بيانات جوجل", "error");
+                return;
+            }
+
+            showProgress("جاري المصادقة السريعة مع خوادم Google ⚡...");
+            
+            fetch(`${LOGIN_API_URL}?action=googleLogin&email=${encodeURIComponent(payload.email)}`)
+                .then(r => r.json())
+                .then(d => {
+                    completeProgress();
+                    if (d.status === 'success') {
+                        // Use payload name if API doesn't return one
+                        if (!d.userName) d.userName = payload.name;
+                        saveSessionAndRedirect(d, payload.email);
+                    } else {
+                        showToast(d.message || "غير مصرح بالدخول", "error");
+                    }
+                })
+                .catch(e => {
+                    completeProgress();
+                    showToast("❌ خطأ في الاتصال.", "error");
+                });
+        }
+
+        function saveSessionAndRedirect(data, email) {
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userName', data.userName);
+            localStorage.setItem('userRole', data.role);
+            localStorage.setItem('userGroup', data.group);
+            localStorage.setItem('userEmail', email);
+            localStorage.setItem('sessionToken', data.sessionToken);
+            
+            showToast(`✅ أهلاً بك في منصة Eduneers، ${data.userName}`, "success");
+            
+            // Redirect to main app page after slight delay
+            setTimeout(() => {
+                window.location.href = 'index.html'; // Change to your actual dashboard filename
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
