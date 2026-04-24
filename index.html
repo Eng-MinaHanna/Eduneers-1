@@ -1082,7 +1082,60 @@
     </div>
 
     <script>
-        const CENTRAL_LINKS_API = "https://script.google.com/macros/s/AKfycbxFT_0yMGQMp2tK_F3G_ndN-b5URC-PQOxaT63rLPExzCNyV6p9-UKGpKELVnJbc2LA/exec";
+    // Login check - show login form if not logged in
+    if (localStorage.getItem('isLoggedIn') !== 'true') {
+      document.body.innerHTML = `
+        <div style="display:flex;justify-content:center;align-items:center;min-height:100vh;background:linear-gradient(135deg,#f1f5f9,#e2e8f0);flex-direction:column;gap:20px;padding:20px;">
+          <h1 style="color:#0f172a;font-size:36px;font-weight:900;">⚡ Eduneers</h1>
+          <div style="background:white;padding:40px;border-radius:24px;box-shadow:0 10px40px rgba(0,0,0,0.1);width:100%;max-width:400px;">
+            <h2 style="text-align:center;margin-bottom:25px;color:#334155;">تسجيل الدخول</h2>
+            <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" style="width:100%;padding:14px;border:2px solid #e2e8f0;border-radius:12px;margin-bottom:15px;font-family:Cairo;">
+            <input type="password" id="loginPass" placeholder="كلمة المرور" style="width:100%;padding:14px;border:2px solid #e2e8f0;border-radius:12px;margin-bottom:15px;font-family:Cairo;">
+            <button onclick="doLogin()" style="width:100%;padding:16px;background:#f5b041;color:#0f172a;border:none;border-radius:12px;font-weight:800;font-size:16px;cursor:pointer;">دخول</button>
+            <p id="loginError" style="color:#ef4444;text-align:center;margin-top:15px;display:none;"></p>
+          </div>
+        </div>
+        <script>
+          async function doLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPass').value;
+            const error = document.getElementById('loginError');
+            
+            if (!email || !pass) {
+              error.innerText = 'برجاء إدخال البيانات';
+              error.style.display = 'block';
+              return;
+            }
+            
+            error.style.display = 'none';
+            
+            try {
+              const res = await fetch('https://script.google.com/macros/s/AKfycbw-oytOWrgERm2yXu-NagMlyS14HlUGeAlsWqrZl2SwRJIi0IDL1AH2VduQvsmIIkNgFA/exec?action=login&email=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(pass));
+              const data = await res.json();
+              
+              if (data.status === 'success') {
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userName', data.userName);
+                localStorage.setItem('userRole', data.role);
+                localStorage.setItem('userGroup', data.group);
+                localStorage.setItem('userEmail', email);
+                localStorage.setItem('sessionToken', data.sessionToken);
+                window.location.reload();
+              } else {
+                error.innerText = data.message || 'خطأ في البيانات';
+                error.style.display = 'block';
+              }
+            } catch (e) {
+              error.innerText = 'خطأ في الاتصال';
+              error.style.display = 'block';
+            }
+          }
+        <\/script>
+      `;
+      throw new Error('Show login');
+    }
+
+    const CENTRAL_LINKS_API = "https://script.google.com/macros/s/AKfycbxFT_0yMGQMp2tK_F3G_ndN-b5URC-PQOxaT63rLPExzCNyV6p9-UKGpKELVnJbc2LA/exec";
 
         // Single API for all operations - Grade Sheet handles scan/saveGrade/saveQuiz/saveExtra/getTop
         let GRADES_API = "https://script.google.com/macros/s/AKfycbx715VQ1MfNK_yLaX6m2rrNaGrJANjIGss9ysM4Sv8z6npcjVJOdnGZZDbJL74-oxDu/exec";
