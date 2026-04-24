@@ -1618,22 +1618,34 @@ function submitData() {
             const lec = document.getElementById('currentLecNum').value;
             const auth = getAuthParams();
             const centralApi = getEffectiveApi(GRADES_API);
+            let promises = [];
             
-            fetch(`${centralApi}?action=scan&qrCode=${code}&lectureNum=${lec}&weight=15${auth}`)
-                .then(r => r.json())
-                .then(data => {
-                    if (data.status === "success") {
-                        showToast("✅ تم تسجيل حضور: " + (data.name || code), "success");
-                        playBeep('success');
-                    } else {
-                        showToast(data.message || "❌ خطأ", "error");
-                        playBeep('error');
-                    }
-                })
-                .catch(e => {
-                    showToast("❌ خطأ في الاتصال", "error");
+            // 1. Save to Central Sheet
+            promises.push(fetch(`${centralApi}?action=scan&qrCode=${code}&lectureNum=${lec}&weight=15${auth}`).then(r => r.json()).catch(e => ({})));
+            
+            // 2. Sync to Individual Student Sheet
+            let personalApi = getPersonalApi(code);
+            if (personalApi) {
+                let taskName = "TASK " + lec;
+                promises.push(
+                    fetch(`${personalApi}?action=update&qrCode=${code}&taskName=${encodeURIComponent(taskName)}&category=${encodeURIComponent('attendance .15')}&val=15`)
+                    .then(r => r.json()).then(res => console.log("Sync Attendance:", res)).catch(e => console.error("Sync Error:", e))
+                );
+            }
+            
+            Promise.all(promises).then(results => {
+                const data = results[0];
+                if (data && data.status === "success") {
+                    showToast("✅ تم تسجيل حضور: " + (data.name || code), "success");
+                    playBeep('success');
+                } else {
+                    showToast(data?.message || "❌ خطأ", "error");
                     playBeep('error');
-                });
+                }
+            }).catch(e => {
+                showToast("❌ خطأ في الاتصال", "error");
+                playBeep('error');
+            });
         }
 
         function submitManualCode() {
