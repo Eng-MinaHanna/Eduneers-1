@@ -902,26 +902,27 @@
             <div style="max-width: 600px; margin: auto;">
                 <h3 style="color:var(--accent); text-align:center; font-size:22px; font-weight:800; margin-bottom:15px;">📊 سجل الحضور</h3>
                 
-                <div class="filter-box">
-                    <label style="font-size:13px; font-weight:bold;">عرض محاضرات</label>
-                    <div>
-                        <input type="number" id="attendFrom" value="1" class="small-input"> إلى <input type="number" id="attendTo" value="10" class="small-input">
-                    </div>
+                <!-- Single Lecture Filter -->
+                <div style="margin-bottom: 20px;">
+                    <label style="font-size:13px; font-weight:bold; color:var(--text-muted);">اختر المحاضرة</label>
+                    <select id="singleLecture" style="margin-bottom:0;" onchange="loadSingleLectureAttend()">
+                        <script>for (let i = 1; i <= 20; i++) document.write(`<option value="${i}">المحاضرة ${i}</option>`);</script>
+                    </select>
                 </div>
                 
-                <button class="btn-submit" onclick="loadAttendanceList()" style="background: var(--accent); color:#000;">🔄 تحميل السجل</button>
+                <button class="btn-submit" onclick="loadSingleLectureAttend()">🔄 تحميل</button>
                 
                 <div class="table-container" style="margin-top:20px;">
                     <table id="attendListTable">
                         <thead>
                             <tr>
-                                <th>الكود</th>
-                                <th>الاسم</th>
-                                <th>الحضور</th>
+                                <th style="width:30%;">الكود</th>
+                                <th style="width:40%;">الاسم</th>
+                                <th style="width:30%;">الحالة</th>
                             </tr>
                         </thead>
                         <tbody id="attendListBody">
-                            <tr><td colspan="3" style="text-align:center; padding:20px;">اضغط تحميل لرؤية السجل</td></tr>
+                            <tr><td colspan="3" style="text-align:center; padding:20px;">اختر المحاضرة واضغط تحميل</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -1706,25 +1707,24 @@ function submitData() {
             document.getElementById('manualCode').value = "";
         }
 
-        // ==========================================
-        // Attendance List Dashboard
-        // ==========================================
+// ==========================================
+// Attendance List Dashboard
+// ==========================================
         let allAttendList = [];
         
-        async function loadAttendanceList() {
-            const fl = document.getElementById('attendFrom').value || 1;
-            const tl = document.getElementById('attendTo').value || 10;
+        async function loadSingleLectureAttend() {
+            const lec = document.getElementById('singleLecture').value;
             const auth = getAuthParams();
             const centralApi = getEffectiveApi(GRADES_API);
             
-            showLoader(true, "جاري تحميل سجل الحضور...");
+            showLoader(true, `جاري تحميل حضور المحاضرة ${lec}...`);
             
             try {
-                const res = await fetch(`${centralApi}?action=getTop&fromLec=${fl}&toLec=${tl}&weight=15${auth}`).then(r => r.json());
+                const res = await fetch(`${centralApi}?action=getTop&fromLec=${lec}&toLec=${lec}&weight=15${auth}`).then(r => r.json());
                 
                 if (res.status === "success" && res.scores) {
                     allAttendList = res.scores.sort((a, b) => (b.total || 0) - (a.total || 0));
-                    renderAttendList();
+                    renderSingleAttend(lec);
                 } else {
                     showToast("❌ لا توجد بيانات", "error");
                 }
@@ -1735,12 +1735,8 @@ function submitData() {
             showLoader(false);
         }
         
-        function renderAttendList() {
+        function renderSingleAttend(lec) {
             const tbody = document.getElementById('attendListBody');
-            
-            const fl = parseInt(document.getElementById('attendFrom').value || 1);
-            const tl = parseInt(document.getElementById('attendTo').value || 10);
-            const totalLec = tl - fl + 1;
             
             if (!allAttendList.length) {
                 tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px;">لا توجد بيانات</td></tr>';
@@ -1749,19 +1745,18 @@ function submitData() {
             
             let html = '';
             allAttendList.forEach(s => {
-                const present = s.total || 0;
-                const absent = totalLec - present;
-                const statusColor = present >= (totalLec * 0.8) ? '#10b981' : present >= (totalLec * 0.5) ? '#f59e0b' : '#ef4444';
-                const statusText = present >= (totalLec * 0.8) ? 'ممتاز' : present >= (totalLec * 0.5) ? 'ضعيف' : 'غياب';
+                const present = s.total > 0;
+                const statusBg = present ? '#10b981' : '#fee2e2';
+                const statusColor = present ? '#fff' : '#ef4444';
+                const statusIcon = present ? '✓ حاضر' : '✕ غائب';
                 
-                html += `<tr>
+                html += `<tr style="background:${present ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)'};">
                     <td style="font-weight:800; font-family:monospace;">${s.id}</td>
                     <td style="font-weight:600;">${s.name || '-'}</td>
                     <td>
-                        <div style="display:flex; justify-content:center; gap:8px; align-items:center;">
-                            <span style="background:#10b981; color:#fff; padding:4px 10px; border-radius:15px; font-weight:800;">✓ ${present}</span>
-                            <span style="background:#ef4444; color:#fff; padding:4px 10px; border-radius:15px; font-weight:800;">✕ ${absent}</span>
-                        </div>
+                        <span style="background:${statusBg}; color:${statusColor}; padding:6px 14px; border-radius:20px; font-weight:800; font-size:14px;">
+                            ${statusIcon}
+                        </span>
                     </td>
                 </tr>`;
             });
