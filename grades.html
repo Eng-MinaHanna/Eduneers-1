@@ -787,7 +787,7 @@
         <button class="close-btn" onclick="toggleSidebar()">×</button>
         <div
             style="padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px;">
-            <div style="font-weight: 900; color: var(--electric-blue); font-size: 1.3rem;">نظام التقييم المركزي</div>
+            <div style="font-weight: 900; color: var(--electric-blue); font-size: 1.3rem;">نظام Eduneers المتكامل</div>
             <div id="sideRole"
                 style="font-size: 10px; opacity: 0.7; margin-top: 5px; text-transform: uppercase; background: rgba(255,255,255,0.1); display: inline-block; padding: 4px 10px; border-radius: 8px;">
             </div>
@@ -796,23 +796,35 @@
         <a href="#" class="active" onclick="switchView('grading'); toggleSidebar();" id="nav-grading">
             <span>📝</span> <span>رصد الدرجات</span>
         </a>
+        <a href="#" onclick="switchView('manual'); toggleSidebar();" id="nav-manual">
+            <span>✍️</span> <span>تسجيل الحضور</span>
+        </a>
         <a href="#" onclick="switchView('searchView'); toggleSidebar();" id="nav-searchView">
             <span>🔍</span> <span>استعلام شامل</span>
         </a>
         <a href="#" onclick="switchView('attendeesView'); toggleSidebar();" id="nav-attendeesView">
             <span>👥</span> <span>الحضور (الشيت)</span>
         </a>
+        <a href="#" onclick="switchView('dashboard'); toggleSidebar();" id="nav-dashboard">
+            <span>📊</span> <span>لوحة المتابعة</span>
+        </a>
         <a href="#" class="manager-only" onclick="switchView('topView'); toggleSidebar();" id="nav-topView">
             <span>🏆</span> <span>لوحة الشرف Top 5</span>
         </a>
+        <a href="#" class="manager-only" onclick="switchView('analytics'); toggleSidebar();" id="nav-analytics">
+            <span>📈</span> <span>إحصائيات الجروبات</span>
+        </a>
+        <a href="#" class="manager-only" onclick="switchView('mail'); toggleSidebar();" id="nav-mail">
+            <span>📧</span> <span>الإعلانات والبريد</span>
+        </a>
+
+        <div class="sidebar-heading admin-only">إدارة النظام</div>
         <a href="#" class="manager-only" onclick="switchView('settings'); toggleSidebar();" id="nav-settings">
             <span>⚙️</span> <span>إعدادات النظام</span>
         </a>
 
         <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 15px 25px;"></div>
-        <a href="index.html" style="color: var(--accent);"><span>🏠</span> <span>نظام الحضور</span></a>
-        <a href="#" onclick="logout()" style="color: #ef4444; margin-top: 10px;"><span>🚪</span> <span>تسجيل
-                الخروج</span></a>
+        <a href="#" onclick="logout()" style="color: #ef4444; margin-top: 10px;"><span>🚪</span> <span>تسجيل الخروج</span></a>
     </div>
 
     <div class="container">
@@ -950,6 +962,64 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+
+        <div id="view-manual" class="view-section">
+            <div style="max-width: 500px; margin: auto;">
+                <h3 style="color:var(--electric-blue); text-align:center; font-size:24px; font-weight:800; margin-bottom:20px;">
+                    التسجيل اليدوي للحضور</h3>
+                <p style="font-size:14px; color:var(--text-muted); text-align:center; margin-bottom:20px;">أدخل <b>رقم الطالب فقط</b> (يدعم الأرقام العربية ١٢٣).</p>
+                <input type="text" id="manualCode" placeholder="مثال: 15 أو ١٥" style="text-align:center; font-size:24px; letter-spacing:4px; font-weight:900;">
+                <div style="margin-bottom:20px;">
+                    <label style="font-size:13px; font-weight:bold; color:var(--text-muted);">رقم المحاضرة</label>
+                    <select id="manualLecNum" style="margin-bottom:0;">
+                        <script>for (let i = 1; i <= 20; i++) document.write(`<option value="${i}">المحاضرة ${i}</option>`);</script>
+                    </select>
+                </div>
+                <button class="btn-primary" onclick="submitManualAttend()">تسجيل الحضور 📥</button>
+            </div>
+        </div>
+
+        <div id="view-dashboard" class="view-section">
+            <div style="max-width: 600px; margin: auto;">
+                <h3 style="color:var(--electric-blue); text-align:center; font-size:24px; font-weight:800; margin-bottom:20px;">
+                    📊 لوحة المتابعة</h3>
+                <div style="display:flex; gap:10px; margin-bottom:15px;">
+                    <button class="btn-secondary" style="flex:1; margin:0;" onclick="loadDashboard()">🔄 تحديث</button>
+                </div>
+                <div class="search-box" style="position:relative; margin-bottom:15px;">
+                    <input type="text" id="searchDashInput" placeholder="بحث بالاسم أو الكود..." onkeyup="filterDashboard()"
+                        style="margin:0; padding:14px; padding-right:45px; box-sizing:border-box; width:100%; text-align:right;">
+                    <span style="position:absolute; right:15px; top:16px; opacity:0.5;">🔍</span>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th>الكود</th><th>الاسم</th><th>الحالة</th></tr>
+                        </thead>
+                        <tbody id="dashList">
+                            <tr><td colspan="3" style="text-align:center; padding:20px; color:var(--text-muted);">اضغط تحديث</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-analytics" class="view-section manager-only">
+            <div style="max-width: 600px; margin: auto;">
+                <h3 style="color:var(--electric-blue); text-align:center; font-size:24px; font-weight:800; margin-bottom:20px;">
+                    📈 إحصائيات الجروب</h3>
+                <div id="analyticsContent" style="text-align:center; padding:40px; color:var(--text-muted);">جاري تحميل الإحصائيات...</div>
+            </div>
+        </div>
+
+        <div id="view-mail" class="view-section manager-only">
+            <div style="max-width: 500px; margin: auto;">
+                <h3 style="color:var(--electric-blue); text-align:center; font-size:24px; font-weight:800; margin-bottom:20px;">
+                    📧 الإعلانات والبريد</h3>
+                <textarea id="mailMsg" placeholder="اكتب رسالتك هنا..." style="width:100%; height:150px; margin-bottom:15px; padding:15px; border-radius:12px; background:var(--card-bg); color:var(--text-main); border:1px solid rgba(255,255,255,0.1);"></textarea>
+                <button class="btn-submit" onclick="sendBroadcast()">إرسال للجميع 📤</button>
             </div>
         </div>
 
@@ -1360,6 +1430,82 @@
         function filterAttendees() {
             const query = document.getElementById('attendSearchInput').value.toLowerCase();
             renderAttendeesTable(allAttendees.filter(a => (a.name || "").toLowerCase().includes(query) || (a.id || "").toString().toLowerCase().includes(query)));
+        }
+
+        let allDashboard = [];
+        function loadDashboard() {
+            const lec = document.getElementById('currentLecNum')?.value || "1";
+            const group = localStorage.getItem('userGroup') || "Group A";
+            const tbody = document.getElementById('dashList');
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:30px;">⏳ جاري المزامنة...</td></tr>`;
+            
+            const auth = getAuthParams();
+            fetch(`${getEffectiveApi(ATTEND_API)}?action=getTop&fromLec=${lec}&toLec=${lec}&weight=15${auth}`)
+                .then(res => res.json()).then(data => {
+                    if (data.status === "success" && data.scores) {
+                        allDashboard = data.scores.map(s => ({
+                            id: s.id, name: s.name, status: s.total > 0 ? "✅ حاضر" : "❌ غياب"
+                        }));
+                        renderDashboard(allDashboard);
+                    } else {
+                        allDashboard = [];
+                        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:30px; color:var(--text-muted);">لا توجد سجلات</td></tr>`;
+                    }
+                }).catch(err => {
+                    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#ef4444; padding:30px;">❌ خطأ</td></tr>`;
+                });
+        }
+
+        function renderDashboard(dataArray) {
+            const tbody = document.getElementById('dashList');
+            if (dataArray.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:20px;">لا نتائج</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = dataArray.map(a => `<tr><td style="font-weight:800; color:var(--electric-blue);">${a.id}</td><td style="font-weight:600;">${a.name}</td><td>${a.status}</td></tr>`).join('');
+        }
+
+        function filterDashboard() {
+            const query = document.getElementById('searchDashInput').value.toLowerCase();
+            renderDashboard(allDashboard.filter(a => (a.name || "").toLowerCase().includes(query) || (a.id || "").toString().toLowerCase().includes(query)));
+        }
+
+        function submitManualAttend() {
+            let numRaw = document.getElementById('manualCode').value.trim();
+            if (!numRaw) return showToast("❌ برجاء إدخال رقم الطالب", "error");
+            
+            let num = convertNumerals(numRaw);
+            const groupLetter = localStorage.getItem('userGroup').replace("Group ", "").trim();
+            const code = groupLetter + num + "EDUR9";
+            const lec = document.getElementById('manualLecNum').value;
+            const auth = getAuthParams();
+
+            fetch(`${getEffectiveApi(ATTEND_API)}?action=scan&qrCode=${code}&lectureNum=${lec}&weight=15${auth}`)
+                .then(r => r.json()).then(data => {
+                    if (data.status === "success") {
+                        showToast(`✅ تم تسجيل حضور ${data.name || code}`, "success");
+                        document.getElementById('manualCode').value = "";
+                    } else {
+                        showToast(data.message || "❌ خطأ", "error");
+                    }
+                }).catch(err => showToast("❌ خطأ في الاتصال", "error"));
+        }
+
+        function loadAnalytics() {
+            const group = localStorage.getItem('userGroup') || "Group A";
+            const auth = getAuthParams();
+            fetch(`${getEffectiveApi(ATTEND_API)}?action=getAnalytics&group=${encodeURIComponent(group)}${auth}`)
+                .then(r => r.json()).then(d => {
+                    document.getElementById('analyticsContent').innerHTML = `<div style="text-align:center;"><p>إجمالي الطلاب: ${d.count || 0}</p></div>`;
+                }).catch(() => {
+                    document.getElementById('analyticsContent').innerHTML = "❌ خطأ";
+                });
+        }
+
+        function sendBroadcast() {
+            const msg = document.getElementById('mailMsg').value.trim();
+            if (!msg) return showToast("❌ برجاء كتابة رسالة", "error");
+            showToast("📤 جاري الإرسال...", "success");
         }
 
         function submitData() {
