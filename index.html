@@ -800,6 +800,9 @@
         <a href="#" onclick="switchView('attend'); toggleSidebar();" id="nav-attend">
             <span>📷</span> <span>مسح QR للحضور</span>
         </a>
+        <a href="#" onclick="switchView('attendList'); toggleSidebar();" id="nav-attendList">
+            <span>📊</span> <span>سجل الحضور</span>
+        </a>
         <a href="#" onclick="switchView('searchView'); toggleSidebar();" id="nav-searchView">
             <span>🔍</span> <span>استعلام عن طالب</span>
         </a>
@@ -810,10 +813,8 @@
             <span>⚙️</span> <span>إعدادات النظام</span>
         </a>
 
-        <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 15px 25px;"></div>
-        <a href="index.html" style="color: var(--accent);"><span>🏠</span> <span>نظام الحضور</span></a>
-        <a href="#" onclick="logout()" style="color: #ef4444; margin-top: 10px;"><span>🚪</span> <span>تسجيل
-                الخروج</span></a>
+<div style="height: 1px; background: rgba(255,255,255,0.1); margin: 15px 25px;"></div>
+        <a href="#" onclick="logout()" style="color: #ef4444; margin-top: 10px;"><span>🚪</span> <span>تسجيل الخروج</span></a>
     </div>
 
     <div class="container">
@@ -893,6 +894,37 @@
                 <h4 style="text-align:center; color:var(--text-muted);">أو التسجيل اليدوي</h4>
                 <input type="text" id="manualCode" placeholder="أدخل رقم الطالب">
                 <button class="btn-submit" onclick="submitManualCode()">تسجيل الحضور ✍️</button>
+            </div>
+        </div>
+
+        <!-- Attendance Dashboard -->
+        <div id="view-attendList" class="view-section">
+            <div style="max-width: 600px; margin: auto;">
+                <h3 style="color:var(--accent); text-align:center; font-size:22px; font-weight:800; margin-bottom:15px;">📊 سجل الحضور</h3>
+                
+                <div class="filter-box">
+                    <label style="font-size:13px; font-weight:bold;">عرض محاضرات</label>
+                    <div>
+                        <input type="number" id="attendFrom" value="1" class="small-input"> إلى <input type="number" id="attendTo" value="10" class="small-input">
+                    </div>
+                </div>
+                
+                <button class="btn-submit" onclick="loadAttendanceList()" style="background: var(--accent); color:#000;">🔄 تحميل السجل</button>
+                
+                <div class="table-container" style="margin-top:20px;">
+                    <table id="attendListTable">
+                        <thead>
+                            <tr>
+                                <th>الكود</th>
+                                <th>الاسم</th>
+                                <th>الحضور</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendListBody">
+                            <tr><td colspan="3" style="text-align:center; padding:20px;">اضغط تحميل لرؤية السجل</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -1672,6 +1704,55 @@ function submitData() {
             
             handleAttendanceScan(code);
             document.getElementById('manualCode').value = "";
+        }
+
+        // ==========================================
+        // Attendance List Dashboard
+        // ==========================================
+        let allAttendList = [];
+        
+        async function loadAttendanceList() {
+            const fl = document.getElementById('attendFrom').value || 1;
+            const tl = document.getElementById('attendTo').value || 10;
+            const auth = getAuthParams();
+            const centralApi = getEffectiveApi(GRADES_API);
+            
+            showLoader(true, "جاري تحميل سجل الحضور...");
+            
+            try {
+                const res = await fetch(`${centralApi}?action=getTop&fromLec=${fl}&toLec=${tl}&weight=15${auth}`).then(r => r.json());
+                
+                if (res.status === "success" && res.scores) {
+                    allAttendList = res.scores.sort((a, b) => (b.total || 0) - (a.total || 0));
+                    renderAttendList();
+                } else {
+                    showToast("❌ لا توجد بيانات", "error");
+                }
+            } catch (e) {
+                showToast("❌ خطأ في الاتصال", "error");
+            }
+            
+            showLoader(false);
+        }
+        
+        function renderAttendList() {
+            const tbody = document.getElementById('attendListBody');
+            if (!allAttendList.length) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px;">لا توجد بيانات</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            allAttendList.forEach(s => {
+                const present = s.total || 0;
+                const badge = present >= 13 ? '#10b981' : present >= 10 ? '#f59e0b' : '#ef4444';
+                html += `<tr>
+                    <td style="font-weight:800; font-family:monospace;">${s.id}</td>
+                    <td style="font-weight:600;">${s.name || '-'}</td>
+                    <td><span style="background:${badge}; color:#fff; padding:5px 12px; border-radius:20px; font-weight:800;">${present}</span></td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
         }
 
         function playBeep(type) {
