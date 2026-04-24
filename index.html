@@ -845,18 +845,6 @@
                 onchange="changeGlobalGroup(this.value)"></select>
         </div>
 
-        <!-- Login View Section -->
-        <div id="view-login" class="view-section" style="max-width:400px;margin:auto;">
-            <div style="text-align:center;">
-                <h1 style="color:var(--electric-blue);font-size:32px;font-weight:900;margin-bottom:10px;">⚡ Eduneers</h1>
-                <h2 style="color:var(--text-main);margin-bottom:25px;">تسجيل الدخول</h2>
-                <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
-                <input type="password" id="loginPass" placeholder="كلمة المرور">
-                <button class="btn-submit" onclick="doLogin()">دخول</button>
-                <p id="loginError" style="color:#ef4444;text-align:center;margin-top:15px;display:none;"></p>
-            </div>
-        </div>
-
         <div id="view-grading" class="view-section active">
             <div style="max-width: 600px; margin: auto;">
                 
@@ -1094,31 +1082,38 @@
     </div>
 
     <script>
-    // Login check - show login view if not logged in
+    // Login check - show login form if not logged in
     if (localStorage.getItem('isLoggedIn') !== 'true') {
-        // Show login view instead of replacing body
-        showLoginView();
-        throw new Error('Show login');
-    }
-
-    async function doLogin() {
-        const email = document.getElementById('loginEmail').value;
-        const pass = document.getElementById('loginPass').value;
-        const error = document.getElementById('loginError');
-        
-        if (!email || !pass) {
-            error.innerText = 'برجاء إدخال البيانات';
-            error.style.display = 'block';
-            return;
-        }
-        
-        error.style.display = 'none';
-        
-        try {
-            const res = await fetch('https://script.google.com/macros/s/AKfycbw-oytOWrgERm2yXu-NagMlyS14HlUGeAlsWqrZl2SwRJIi0IDL1AH2VduQvsmIIkNgFA/exec?action=login&email=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(pass));
-            const data = await res.json();
+      document.body.innerHTML = `
+        <div style="display:flex;justify-content:center;align-items:center;min-height:100vh;background:linear-gradient(135deg,#f1f5f9,#e2e8f0);flex-direction:column;gap:20px;padding:20px;">
+          <h1 style="color:#0f172a;font-size:36px;font-weight:900;">⚡ Eduneers</h1>
+          <div style="background:white;padding:40px;border-radius:24px;box-shadow:0 10px40px rgba(0,0,0,0.1);width:100%;max-width:400px;">
+            <h2 style="text-align:center;margin-bottom:25px;color:#334155;">تسجيل الدخول</h2>
+            <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" style="width:100%;padding:14px;border:2px solid #e2e8f0;border-radius:12px;margin-bottom:15px;font-family:Cairo;">
+            <input type="password" id="loginPass" placeholder="كلمة المرور" style="width:100%;padding:14px;border:2px solid #e2e8f0;border-radius:12px;margin-bottom:15px;font-family:Cairo;">
+            <button onclick="doLogin()" style="width:100%;padding:16px;background:#f5b041;color:#0f172a;border:none;border-radius:12px;font-weight:800;font-size:16px;cursor:pointer;">دخول</button>
+            <p id="loginError" style="color:#ef4444;text-align:center;margin-top:15px;display:none;"></p>
+          </div>
+        </div>
+        <script>
+          async function doLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPass').value;
+            const error = document.getElementById('loginError');
             
-            if (data.status === 'success') {
+            if (!email || !pass) {
+              error.innerText = 'برجاء إدخال البيانات';
+              error.style.display = 'block';
+              return;
+            }
+            
+            error.style.display = 'none';
+            
+            try {
+              const res = await fetch('https://script.google.com/macros/s/AKfycbw-oytOWrgERm2yXu-NagMlyS14HlUGeAlsWqrZl2SwRJIi0IDL1AH2VduQvsmIIkNgFA/exec?action=login&email=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(pass));
+              const data = await res.json();
+              
+              if (data.status === 'success') {
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userName', data.userName);
                 localStorage.setItem('userRole', data.role);
@@ -1126,21 +1121,18 @@
                 localStorage.setItem('userEmail', email);
                 localStorage.setItem('sessionToken', data.sessionToken);
                 window.location.reload();
-            } else {
+              } else {
                 error.innerText = data.message || 'خطأ في البيانات';
                 error.style.display = 'block';
+              }
+            } catch (e) {
+              error.innerText = 'خطأ في الاتصال';
+              error.style.display = 'block';
             }
-        } catch (e) {
-            error.innerText = 'خطأ في الاتصال';
-            error.style.display = 'block';
-        }
-    }
-
-    function showLoginView() {
-        // Hide navbar and sidebar, show only login
-        document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
-        document.getElementById('view-login').classList.add('active');
-        document.querySelector('.navbar').style.display = 'none';
+          }
+        <\/script>
+      `;
+      throw new Error('Show login');
     }
 
     const CENTRAL_LINKS_API = "https://script.google.com/macros/s/AKfycbxFT_0yMGQMp2tK_F3G_ndN-b5URC-PQOxaT63rLPExzCNyV6p9-UKGpKELVnJbc2LA/exec";
@@ -1338,10 +1330,9 @@
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('show'); }
         function logout() {
-            // Clear session and show login view instead of reload
+            // Clear session and reload to show login
             localStorage.clear();
-            showLoginView();
-            throw new Error('Show login');
+            window.location.reload();
         }
 
         function fillGroupSelects() {
