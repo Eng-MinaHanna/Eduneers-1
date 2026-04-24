@@ -798,7 +798,7 @@
             <span>📝</span> <span>رصد الدرجات والحضور</span>
         </a>
         <a href="#" onclick="switchView('attend'); toggleSidebar();" id="nav-attend">
-            <span>📷</span> <span>مسح QR للحضور</span>
+            <span>📷</span> <span>تسجيل الحضور</span>
         </a>
         <a href="#" onclick="switchView('attendList'); toggleSidebar();" id="nav-attendList">
             <span>📊</span> <span>سجل الحضور</span>
@@ -872,7 +872,7 @@
         <!-- Quick Attend Tab (QR Scanner) -->
         <div id="view-attend" class="view-section">
             <div style="max-width: 500px; margin: auto;">
-                <h3 style="color:var(--accent); text-align:center; font-size:22px; font-weight:800; margin-bottom:15px;">📷 نظام الحضور</h3>
+                <h3 style="color:var(--accent); text-align:center; font-size:22px; font-weight:800; margin-bottom:15px;">📷 تسجيل الحضور</h3>
                 
                 <!-- Lecture Selection -->
                 <label style="font-size:13px; font-weight:bold; color:var(--text-muted);">رقم المحاضرة</label>
@@ -880,20 +880,8 @@
                     <script>for (let i = 1; i <= 20; i++) document.write(`<option value="${i}">المحاضرة ${i}</option>`);</script>
                 </select>
                 
-                <select id="cameraSelection">
-                    <option value="">جاري البحث عن كاميرات...</option>
-                </select>
-                <button class="btn-submit" onclick="startLiveCamera()" style="display:flex; justify-content:center;">🎥 تفعيل الكاميرا</button>
-                
-                <div id="reader" style="width:100%; border-radius:20px; overflow:hidden; display:none; border:3px dashed var(--accent); margin:15px 0; padding:10px;">
-                </div>
-                <button class="btn-submit" id="stopCamBtn" style="display:none;" onclick="stopLiveCamera()">إيقاف الكاميرا</button>
-                
-                <hr style="margin:20px 0;">
-                
-                <h4 style="text-align:center; color:var(--text-muted);">أو التسجيل اليدوي</h4>
-                <input type="text" id="manualCode" placeholder="أدخل رقم الطالب">
-                <button class="btn-submit" onclick="submitManualCode()">تسجيل الحضور ✍️</button>
+                <input type="text" id="manualCode" placeholder="أدخل رقم الطالب" style="font-size:1.4rem; text-align:center; letter-spacing:3px;">
+                <button class="btn-submit" onclick="submitManualCode()" style="font-size:1.1rem; padding:18px;">تسجيل الحضور ✓</button>
             </div>
         </div>
 
