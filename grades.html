@@ -1064,11 +1064,10 @@
     <script>
         const CENTRAL_LINKS_API = "https://script.google.com/macros/s/AKfycbxFT_0yMGQMp2tK_F3G_ndN-b5URC-PQOxaT63rLPExzCNyV6p9-UKGpKELVnJbc2LA/exec";
 
-        let GRADES_API = "https://script.google.com/macros/s/AKfycbx715VQ1MfNK_yLaX6m2rrNaGrJANjIGss9ysM4Sv8z6npcjVJOdnGZZDbJL74-oxDu/exec";
-        let QUIZ_API = "https://script.google.com/macros/s/AKfycbwne4ufHfwjbcS6p39pfslPsTtPsQn8n24zapV4ytou5L4sacK0Y8KHYq_vx64PiYOVMQ/exec";
+        let GRADES_API = "https://script.google.com/macros/s/AKfycbyQlZlxpCyr68rjjsxGmXrPcLk0X7agsGEpG6YaGGNZwTvPY3sSbx2td5blRPP6oqbfhg/exec";
+        let QUIZ_API = "https://script.google.com/macros/s/AKfycbyQlZlxpCyr68rjjsxGmXrPcLk0X7agsGEpG6YaGGNZwTvPY3sSbx2td5blRPP6oqbfhg/exec";
         let ATTEND_API = "https://script.google.com/macros/s/AKfycbyQlZlxpCyr68rjjsxGmXrPcLk0X7agsGEpG6YaGGNZwTvPY3sSbx2td5blRPP6oqbfhg/exec";
-        let ATTENDANCE_API_URL = "https://script.google.com/macros/s/AKfycbyJEb3_K7ORGnidD1GT6AjDS3kGgHjBMMAZ7iKT7tkI4JKR7pfRknMl-UumqqWW_5Hk3Q/exec";
-        let EXTRA_API = "https://script.google.com/macros/s/AKfycbw6jcjRGj-08bLUez0S311RIjPZLdpHwXs4BflMRnsKlplaGfipTRCLpHloDnIlo4S5cg/exec";
+        let EXTRA_API = "https://script.google.com/macros/s/AKfycbyQlZlxpCyr68rjjsxGmXrPcLk0X7agsGEpG6YaGGNZwTvPY3sSbx2td5blRPP6oqbfhg/exec";
 
         // 🔗 دالة اختيار الـ API المناسب (الافتراضي أو المخصص للجروب)
         function getEffectiveApi(originalUrl) {
@@ -1329,11 +1328,16 @@
             tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:30px;">⏳ جاري المزامنة...</td></tr>`;
             
             const auth = getAuthParams();
-            fetch(`${getEffectiveApi(ATTENDANCE_API_URL)}?action=getDashboard&lectureNum=${encodeURIComponent(lec)}&group=${encodeURIComponent(group)}${auth}`)
+            fetch(`${getEffectiveApi(ATTEND_API)}?action=getTop&fromLec=${lec}&toLec=${lec}&weight=15${auth}`)
                 .then(res => res.json()).then(data => {
-                    document.getElementById('attendeesCount').innerText = data.count || 0;
-                    if (data.status === "success" && data.attendees.length > 0) {
-                        allAttendees = data.attendees;
+                    if (data.status === "success" && data.scores) {
+                        const present = data.scores.filter(s => s.total > 0);
+                        document.getElementById('attendeesCount').innerText = present.length + " / " + data.scores.length;
+                        allAttendees = present.map(s => ({
+                            id: s.id,
+                            name: s.name,
+                            time: s.total > 0 ? "✅ حاضر" : "❌ غياب"
+                        }));
                         renderAttendeesTable(allAttendees);
                     } else {
                         allAttendees = [];
