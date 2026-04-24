@@ -845,20 +845,6 @@
                 onchange="changeGlobalGroup(this.value)"></select>
         </div>
 
-        <!-- Login View Section -->
-        <div id="view-login" class="view-section" style="max-width:100%;margin:0;padding:0;background:transparent;border:none;box-shadow:none;display:none;justify-content:center;align-items:center;min-height:100vh;position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#f1f5f9,#e2e8f0);">
-            <div style="text-align:center;width:100%;max-width:420px;padding:20px;">
-                <h1 style="color:#0f172a;font-size:48px;font-weight:900;margin-bottom:40px;text-shadow:0 2px 15px rgba(0,0,0,0.1);">⚡ Eduneers</h1>
-                <div style="background:white;padding:45px;border-radius:28px;box-shadow:0 15px50px rgba(0,0,0,0.12);">
-                    <h2 style="text-align:center;margin-bottom:35px;color:#334155;font-size:26px;font-weight:800;">تسجيل الدخول</h2>
-                    <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" style="width:100%;padding:18px;border:2px solid #e2e8f0;border-radius:14px;margin-bottom:20px;font-family:Cairo;font-size:17px;text-align:center;">
-                    <input type="password" id="loginPass" placeholder="كلمة المرور" style="width:100%;padding:18px;border:2px solid #e2e8f0;border-radius:14px;margin-bottom:20px;font-family:Cairo;font-size:17px;text-align:center;">
-                    <button onclick="doLogin()" style="width:100%;padding:20px;background:#f5b041;color:#0f172a;border:none;border-radius:14px;font-weight:800;font-size:19px;cursor:pointer;margin-top:12px;box-shadow:0 4px15px rgba(245,176,65,0.4);">دخول</button>
-                    <p id="loginError" style="color:#ef4444;text-align:center;margin-top:20px;display:none;font-weight:700;"></p>
-                </div>
-            </div>
-        </div>
-
         <div id="view-grading" class="view-section active">
             <div style="max-width: 600px; margin: auto;">
                 
@@ -1096,55 +1082,10 @@
     </div>
 
     <script>
-    // Login check - show login view if not logged in
+    // Login check - redirect to login page if not logged in
     if (localStorage.getItem('isLoggedIn') !== 'true') {
-        // Show login view instead of replacing body
-        showLoginView();
-        throw new Error('Show login');
-    }
-
-    async function doLogin() {
-        const email = document.getElementById('loginEmail').value;
-        const pass = document.getElementById('loginPass').value;
-        const error = document.getElementById('loginError');
-        
-        if (!email || !pass) {
-            error.innerText = 'برجاء إدخال البيانات';
-            error.style.display = 'block';
-            return;
-        }
-        
-        error.style.display = 'none';
-        
-        try {
-            const res = await fetch('https://script.google.com/macros/s/AKfycbw-oytOWrgERm2yXu-NagMlyS14HlUGeAlsWqrZl2SwRJIi0IDL1AH2VduQvsmIIkNgFA/exec?action=login&email=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(pass));
-            const data = await res.json();
-            
-            if (data.status === 'success') {
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('userName', data.userName);
-                localStorage.setItem('userRole', data.role);
-                localStorage.setItem('userGroup', data.group);
-                localStorage.setItem('userEmail', email);
-                localStorage.setItem('sessionToken', data.sessionToken);
-                window.location.reload();
-            } else {
-                error.innerText = data.message || 'خطأ في البيانات';
-                error.style.display = 'block';
-            }
-        } catch (e) {
-            error.innerText = 'خطأ في الاتصال';
-            error.style.display = 'block';
-        }
-    }
-
-    function showLoginView() {
-        // Hide navbar, show full-screen login
-        document.querySelector('.navbar').style.display = 'none';
-        document.querySelector('.circuit-bg').style.display = 'none';
-        const loginView = document.getElementById('view-login');
-        loginView.style.display = 'flex';
-        loginView.classList.add('active');
+        window.location.href = 'login.html';
+        throw new Error('Redirect to login');
     }
 
     const CENTRAL_LINKS_API = "https://script.google.com/macros/s/AKfycbxFT_0yMGQMp2tK_F3G_ndN-b5URC-PQOxaT63rLPExzCNyV6p9-UKGpKELVnJbc2LA/exec";
@@ -1342,10 +1283,8 @@
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('show'); }
         function logout() {
-            // Clear session and show login view instead of reload
             localStorage.clear();
-            showLoginView();
-            throw new Error('Show login');
+            window.location.href = 'login.html';
         }
 
         function fillGroupSelects() {
