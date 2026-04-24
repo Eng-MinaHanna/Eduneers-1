@@ -871,7 +871,13 @@
         <!-- Quick Attend Tab (QR Scanner) -->
         <div id="view-attend" class="view-section">
             <div style="max-width: 500px; margin: auto;">
-                <h3 style="color:var(--accent); text-align:center; font-size:22px; font-weight:800; margin-bottom:15px;">📷 مسح QR للحضور</h3>
+                <h3 style="color:var(--accent); text-align:center; font-size:22px; font-weight:800; margin-bottom:15px;">📷 نظام الحضور</h3>
+                
+                <!-- Lecture Selection -->
+                <label style="font-size:13px; font-weight:bold; color:var(--text-muted);">رقم المحاضرة</label>
+                <select id="attendLectureNum" style="margin-bottom:15px;">
+                    <script>for (let i = 1; i <= 20; i++) document.write(`<option value="${i}">المحاضرة ${i}</option>`);</script>
+                </select>
                 
                 <select id="cameraSelection">
                     <option value="">جاري البحث عن كاميرات...</option>
@@ -1615,7 +1621,9 @@ function submitData() {
             code = code.toUpperCase();
             if (!code.endsWith("EDUR9")) code = code + "EDUR9";
             
-            const lec = document.getElementById('currentLecNum').value;
+            // Use attendLectureNum from attendance page, fallback to currentLecNum
+            const lecSelect = document.getElementById('attendLectureNum');
+            const lec = lecSelect ? lecSelect.value : document.getElementById('currentLecNum').value;
             const auth = getAuthParams();
             const centralApi = getEffectiveApi(GRADES_API);
             let promises = [];
@@ -1655,6 +1663,12 @@ function submitData() {
             let num = convertNumerals(raw);
             const group = localStorage.getItem('userGroup') || "Group A";
             const code = group.replace("Group ", "").trim() + num + "EDUR9";
+            
+            // Sync lecture selection between pages
+            const lecSelect = document.getElementById('attendLectureNum');
+            if (lecSelect) {
+                document.getElementById('currentLecNum').value = lecSelect.value;
+            }
             
             handleAttendanceScan(code);
             document.getElementById('manualCode').value = "";
