@@ -7,6 +7,7 @@
     <title> Eduneers | Grades System </title>
     <link rel="manifest" href="manifest.json">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
@@ -601,6 +602,45 @@
             }
         }
 
+        /* Login Page Styles */
+        .logo-light, .logo-dark { display: none; }
+        body:not(.dark-mode) .logo-light { display: inline-block; }
+        body.dark-mode .logo-dark { display: inline-block; }
+
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+        }
+        .divider hr { border: none; border-top: 1px solid rgba(0,0,0,0.1); }
+        .divider span {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--card-bg);
+            padding: 0 20px;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 10px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .google-btn-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(248,250,252,0.5);
+            border-radius: 20px;
+            border: 2px dashed rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode .divider hr { border-top-color: rgba(255,255,255,0.1); }
+        body.dark-mode .divider span { background: rgba(15,23,42,0.9); color: var(--electric-blue); border-color: rgba(0,210,255,0.2); }
+        body.dark-mode .google-btn-container { background: rgba(30,41,59,0.5); border-color: rgba(255,255,255,0.1); }
+
         /* 🛡️ منطق الصلاحيات الاحترافي */
         .manager-only,
         .admin-only,
@@ -818,6 +858,23 @@
 
     <div class="container">
         <div id="toast"></div>
+
+        <!-- Login View Section -->
+        <div id="view-login" class="view-section active">
+            <div class="form-wrapper">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <img src="https://aawyndbhkgiombfqinyf.supabase.co/storage/v1/object/public/new/BIM%20sesion%20(2).png" alt="Eduneers Logo" class="logo-light" style="max-width:150px;margin-bottom:15px;">
+                    <img src="https://aawyndbhkgiombfqinyf.supabase.co/storage/v1/object/public/new/BIM%20sesion%20(4).png" alt="Eduneers Logo" class="logo-dark" style="max-width:150px;margin-bottom:15px;">
+                    <h2 style="color:var(--electric-blue);font-size:28px;font-weight:800;">تسجيل الدخول</h2>
+                    <p style="color:var(--text-muted);font-size:15px;font-weight:600;">Eduneers Grades System</p>
+                </div>
+                <input type="email" id="loginEmail" placeholder="البريد الإلكتروني..." autocomplete="email">
+                <input type="password" id="loginPassword" placeholder="كلمة المرور..." autocomplete="current-password">
+                <button class="btn-submit" onclick="handleManualLogin()">دخول آمن 🔐</button>
+                <div class="divider"><hr><span>أو باستخدام</span></div>
+                <div class="google-btn-container" id="googleBtnWrapper"></div>
+            </div>
+        </div>
     
     <!-- Student Progress Modal -->
     <div id="studentProgressModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;z-index:3000;" onclick="this.style.display='none'">
@@ -1082,13 +1139,107 @@
     </div>
 
     <script>
-    // Login check - redirect to login page if not logged in
-    if (localStorage.getItem('isLoggedIn') !== 'true') {
-        window.location.href = 'login.html';
-        throw new Error('Redirect to login');
-    }
+        const CENTRAL_LINKS_API = "https://script.google.com/macros/s/AKfycbxFT_0yMGQMp2tK_F3G_ndN-b5URC-PQOxaT63rLPExzCNyV6p9-UKGpKELVnJbc2LA/exec";
 
-    const CENTRAL_LINKS_API = "https://script.google.com/macros/s/AKfycbxFT_0yMGQMp2tK_F3G_ndN-b5URC-PQOxaT63rLPExzCNyV6p9-UKGpKELVnJbc2LA/exec";
+        // Login check - show login view if not logged in
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            switchView('login');
+        }
+
+        function handleManualLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const pass = document.getElementById('loginPassword').value.trim();
+            if (!email || !pass) {
+                showToast("الرجاء إدخال الإيميل وكلمة المرور.", "error");
+                return;
+            }
+            showLoader(true, "جاري التحقق من الهوية 🔐");
+            fetch(`${LOGIN_API_URL}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}`)
+                .then(r => r.json())
+                .then(d => {
+                    showLoader(false);
+                    if (d.status === 'success') {
+                        saveSessionAndRedirect(d, email);
+                    } else {
+                        showToast(d.message || "بيانات غير صحيحة", "error");
+                    }
+                })
+                .catch(e => {
+                    showLoader(false);
+                    showToast("❌ خطأ في الاتصال بالسيرفر المركزي.", "error");
+                });
+        }
+
+        function saveSessionAndRedirect(data, email) {
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userName', data.userName);
+            localStorage.setItem('userRole', data.role);
+            localStorage.setItem('userGroup', data.group);
+            localStorage.setItem('userEmail', email);
+            localStorage.setItem('sessionToken', data.sessionToken);
+            showToast(`✅ أهلاً بك في منصة Eduneers، ${data.userName}`, "success");
+            setTimeout(() => {
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+                switchView('grading');
+                initializeApp();
+            }, 1000);
+        }
+
+        function parseJwt(token) {
+            try {
+                var b = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+                return JSON.parse(decodeURIComponent(atob(b).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+            } catch(e) { return null; }
+        }
+
+        function handleGoogleLogin(res) {
+            const payload = parseJwt(res.credential);
+            if (!payload) {
+                showToast("خطأ في قراءة بيانات جوجل", "error");
+                return;
+            }
+            showLoader(true, "جاري المصادقة مع Google ⚡");
+            fetch(`${LOGIN_API_URL}?action=googleLogin&email=${encodeURIComponent(payload.email)}`)
+                .then(r => r.json())
+                .then(d => {
+                    showLoader(false);
+                    if (d.status === 'success') {
+                        if (!d.userName) d.userName = payload.name;
+                        saveSessionAndRedirect(d, payload.email);
+                    } else {
+                        showToast(d.message || "غير مصرح بالدخول", "error");
+                    }
+                })
+                .catch(e => {
+                    showLoader(false);
+                    showToast("❌ خطأ في الاتصال.", "error");
+                });
+        }
+
+        // Setup Google Login
+        window.onload = function() {
+            if (localStorage.getItem('isLoggedIn') !== 'true') {
+                switchView('login');
+                if (typeof google !== 'undefined' && google.accounts) {
+                    google.accounts.id.initialize({
+                        client_id: "199540075185-0s74k90bdpodvtnao1ce7euec2o0vr31.apps.googleusercontent.com",
+                        callback: handleGoogleLogin,
+                        cancel_on_tap_outside: false
+                    });
+                    google.accounts.id.renderButton(
+                        document.getElementById("googleBtnWrapper"),
+                        { theme: document.body.classList.contains('dark-mode') ? "filled_black" : "outline", size: "large", shape: "pill", text: "signin_with" }
+                    );
+                }
+                document.getElementById('loginPassword').addEventListener('keydown', e => { if (e.key === 'Enter') handleManualLogin(); });
+                document.getElementById('loginEmail').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('loginPassword').focus(); });
+            } else {
+                initializeApp();
+            }
+        };
+
+        function initializeApp() { = "https://script.google.com/macros/s/AKfycbxFT_0yMGQMp2tK_F3G_ndN-b5URC-PQOxaT63rLPExzCNyV6p9-UKGpKELVnJbc2LA/exec";
 
         // Single API for all operations - Grade Sheet handles scan/saveGrade/saveQuiz/saveExtra/getTop
         let GRADES_API = "https://script.google.com/macros/s/AKfycbx715VQ1MfNK_yLaX6m2rrNaGrJANjIGss9ysM4Sv8z6npcjVJOdnGZZDbJL74-oxDu/exec";
@@ -1115,8 +1266,7 @@
             return str.replace(/[٠-٩]/g, w => arabicNumbers.indexOf(w));
         }
 
-        window.onload = () => {
-            // Session check - if not logged in, login form already shown by inline script
+        function initializeApp() {
             if (localStorage.getItem('isLoggedIn') !== 'true') return;
 
             const rawRole = localStorage.getItem('userRole') || "CADRE";
@@ -1273,6 +1423,10 @@
             document.getElementById(`view-${viewId}`).classList.add('active');
             const navItem = document.getElementById(`nav-${viewId}`);
             if (navItem) navItem.classList.add('active');
+
+            // Close sidebar after navigation
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('overlay').classList.remove('show');
         }
 
         function toggleDarkMode() {
@@ -1284,7 +1438,9 @@
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('show'); }
         function logout() {
             localStorage.clear();
-            window.location.href = 'login.html';
+            switchView('login');
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
         }
 
         function fillGroupSelects() {
