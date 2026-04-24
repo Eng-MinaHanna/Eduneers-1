@@ -7,7 +7,6 @@
     <title> Eduneers | Grades System </title>
     <link rel="manifest" href="manifest.json">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://unpkg.com/html5-qrcode"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
@@ -1606,38 +1605,6 @@ function submitData() {
         // ==========================================
         // Attendance Functions (QR Scanner)
         // ==========================================
-        let html5QrCodeScanner = null;
-
-        function startLiveCamera() {
-            const camId = document.getElementById('cameraSelection').value;
-            if (!camId) return showToast("❌ اختر الكاميرا أولاً", "error");
-            
-            document.getElementById('reader').style.display = 'block';
-            document.getElementById('stopCamBtn').style.display = 'block';
-            
-            if (!html5QrCodeScanner) {
-                html5QrCodeScanner = new Html5Qrcode("reader");
-            }
-            
-            html5QrCodeScanner.start(camId, { fps: 10, qrbox: { width: 250, height: 250 } }, 
-                (decodedText) => {
-                    // On success - scan attendance
-                    stopLiveCamera();
-                    handleAttendanceScan(decodedText);
-                }, 
-                (error) => { /* ignore errors */ }
-            ).catch(e => showToast("❌ فشل تشغيل الكاميرا", "error"));
-        }
-
-        function stopLiveCamera() {
-            if (html5QrCodeScanner && html5QrCodeScanner.isScanning) {
-                html5QrCodeScanner.stop().then(() => {
-                    document.getElementById('reader').style.display = 'none';
-                    document.getElementById('stopCamBtn').style.display = 'none';
-                });
-            }
-        }
-
         function handleAttendanceScan(code) {
             code = code.toUpperCase();
             if (!code.endsWith("EDUR9")) code = code + "EDUR9";
@@ -1758,23 +1725,8 @@ function submitData() {
             }
         }
 
-        // Initialize camera on load
+        // Initialize app
         window.onload = function() {
-            if (typeof Html5Qrcode !== 'undefined') {
-                Html5Qrcode.getCameras().then(devices => {
-                    const sel = document.getElementById('cameraSelection');
-                    if (sel && devices && devices.length > 0) {
-                        sel.innerHTML = "";
-                        devices.forEach((d, i) => {
-                            let opt = document.createElement('option');
-                            opt.value = d.id;
-                            opt.text = d.label || "كاميرا " + (i+1);
-                            sel.appendChild(opt);
-                        });
-                    }
-                }).catch(() => {});
-            }
-            
             // Original window.onload
             if (localStorage.getItem('isLoggedIn') !== 'true') { window.location.href = 'index.html'; return; }
             if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark-mode');
