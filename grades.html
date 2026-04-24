@@ -797,7 +797,10 @@
             <span>📝</span> <span>رصد الدرجات</span>
         </a>
         <a href="#" onclick="switchView('searchView'); toggleSidebar();" id="nav-searchView">
-            <span>🔍</span> <span>استعلام عن طالب</span>
+            <span>🔍</span> <span>استعلام شامل</span>
+        </a>
+        <a href="#" onclick="switchView('attendeesView'); toggleSidebar();" id="nav-attendeesView">
+            <span>👥</span> <span>الحضور (الشيت)</span>
         </a>
         <a href="#" class="manager-only" onclick="switchView('topView'); toggleSidebar();" id="nav-topView">
             <span>🏆</span> <span>لوحة الشرف Top 5</span>
@@ -901,6 +904,50 @@
                             </tr>
                         </thead>
                         <tbody id="resDetails"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-attendeesView" class="view-section">
+            <div style="max-width: 600px; margin: auto;">
+                <h3 style="color:var(--electric-blue); text-align:center; font-size:24px; font-weight:800; margin-bottom:20px;">
+                    👥 حضور المحاضرة</h3>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="font-size:13px; font-weight:bold; color:var(--text-muted);">رقم المحاضرة</label>
+                    <select id="attendLecNum" style="margin-bottom:0;">
+                        <script>for (let i = 1; i <= 20; i++) document.write(`<option value="${i}">المحاضرة ${i}</option>`);</script>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn-secondary" style="flex:1; margin:0;" onclick="loadAttendeesFromCentral()">🔄 تحديث</button>
+                </div>
+
+                <div class="dashboard-header">
+                    <span style="font-weight:800; color:var(--primary); font-size:14px;">عدد الحاضرين:</span>
+                    <span class="count-badge" id="attendeesCount">0</span>
+                </div>
+
+                <div class="search-box" style="position:relative; margin: 15px 0;">
+                    <input type="text" id="attendSearchInput" placeholder="بحث بالاسم أو الكود..." onkeyup="filterAttendees()"
+                        style="margin:0; padding:14px; padding-right:45px; box-sizing:border-box; width:100%; text-align:right;">
+                    <span style="position:absolute; right:15px; top:16px; opacity:0.5;">🔍</span>
+                </div>
+
+                <div class="table-container">
+                    <table id="attendeesTable">
+                        <thead>
+                            <tr>
+                                <th>الكود</th>
+                                <th>الاسم</th>
+                                <th>الوقت</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendeesList">
+                            <tr><td colspan="3" style="text-align:center; padding:20px; color:var(--text-muted);">اضغط تحديث لعرض السجلات</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -1020,6 +1067,7 @@
         let GRADES_API = "https://script.google.com/macros/s/AKfycbx715VQ1MfNK_yLaX6m2rrNaGrJANjIGss9ysM4Sv8z6npcjVJOdnGZZDbJL74-oxDu/exec";
         let QUIZ_API = "https://script.google.com/macros/s/AKfycbwne4ufHfwjbcS6p39pfslPsTtPsQn8n24zapV4ytou5L4sacK0Y8KHYq_vx64PiYOVMQ/exec";
         let ATTEND_API = "https://script.google.com/macros/s/AKfycbyQlZlxpCyr68rjjsxGmXrPcLk0X7agsGEpG6YaGGNZwTvPY3sSbx2td5blRPP6oqbfhg/exec";
+        let ATTENDANCE_API_URL = "https://script.google.com/macros/s/AKfycbyJEb3_K7ORGnidD1GT6AjDS3kGgHjBMMAZ7iKT7tkI4JKR7pfRknMl-UumqqWW_5Hk3Q/exec";
         let EXTRA_API = "https://script.google.com/macros/s/AKfycbw6jcjRGj-08bLUez0S311RIjPZLdpHwXs4BflMRnsKlplaGfipTRCLpHloDnIlo4S5cg/exec";
 
         // 🔗 دالة اختيار الـ API المناسب (الافتراضي أو المخصص للجروب)
@@ -1271,6 +1319,43 @@
 
         function getAuthParams() {
             return `&email=${encodeURIComponent(localStorage.getItem('userEmail'))}&token=${encodeURIComponent(localStorage.getItem('sessionToken'))}&group=${encodeURIComponent(localStorage.getItem('userGroup'))}`;
+        }
+
+        let allAttendees = [];
+        function loadAttendeesFromCentral() {
+            const lec = document.getElementById('attendLecNum').value;
+            const group = localStorage.getItem('userGroup') || "Group A";
+            const tbody = document.getElementById('attendeesList');
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:30px;">⏳ جاري المزامنة...</td></tr>`;
+            
+            const auth = getAuthParams();
+            fetch(`${getEffectiveApi(ATTENDANCE_API_URL)}?action=getDashboard&lectureNum=${encodeURIComponent(lec)}&group=${encodeURIComponent(group)}${auth}`)
+                .then(res => res.json()).then(data => {
+                    document.getElementById('attendeesCount').innerText = data.count || 0;
+                    if (data.status === "success" && data.attendees.length > 0) {
+                        allAttendees = data.attendees;
+                        renderAttendeesTable(allAttendees);
+                    } else {
+                        allAttendees = [];
+                        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:30px; color:var(--text-muted);">لا توجد سجلات</td></tr>`;
+                    }
+                }).catch(err => {
+                    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#ef4444; padding:30px;">❌ خطأ في الاتصال</td></tr>`;
+                });
+        }
+
+        function renderAttendeesTable(dataArray) {
+            const tbody = document.getElementById('attendeesList');
+            if (dataArray.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:20px;">لا نتائج</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = dataArray.map(a => `<tr><td style="font-weight:800; color:var(--electric-blue); font-family:monospace;">${a.id}</td><td style="font-weight:600;">${a.name}</td><td><span class="status-badge">${a.time}</span></td></tr>`).join('');
+        }
+
+        function filterAttendees() {
+            const query = document.getElementById('attendSearchInput').value.toLowerCase();
+            renderAttendeesTable(allAttendees.filter(a => (a.name || "").toLowerCase().includes(query) || (a.id || "").toString().toLowerCase().includes(query)));
         }
 
         function submitData() {
