@@ -800,7 +800,7 @@
             <span>📷</span> <span>تسجيل الحضور</span>
         </a>
         <a href="#" onclick="switchView('attendList'); toggleSidebar();" id="nav-attendList">
-            <span>📊</span> <span>سجل الحضور</span>
+            <span>📊</span> <span>لوحة المتدربين</span>
         </a>
         <a href="#" onclick="switchView('searchView'); toggleSidebar();" id="nav-searchView">
             <span>🔍</span> <span>استعلام عن طالب</span>
@@ -818,6 +818,23 @@
 
     <div class="container">
         <div id="toast"></div>
+    
+    <!-- Student Progress Modal -->
+    <div id="studentProgressModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;z-index:3000;" onclick="this.style.display='none'">
+        <div style="background:var(--card-bg);border-radius:20px;padding:30px;max-width:400px;width:90%;text-align:center;direction:rtl;" onclick="event.stopPropagation()">
+            <h3 id="progressStudentName" style="color:var(--electric-blue);margin-bottom:20px;font-size:20px;">اسم الطالب</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:15px;margin-bottom:20px;">
+                <div style="background:#dbeafe;padding:15px;border-radius:12px;"><div id="progAttend" style="font-size:24px;font-weight:900;color:#1d4ed8;">0</div><div style="font-size:12px;">الحضور</div></div>
+                <div style="background:#dcfce7;padding:15px;border-radius:12px;"><div id="progTasks" style="font-size:24px;font-weight:900;color:#15803d;">0</div><div style="font-size:12px;">التاسكات</div></div>
+                <div style="background:#fef3c7;padding:15px;border-radius:12px;"><div id="progQuizzes" style="font-size:24px;font-weight:900;color:#b45309;">0</div><div style="font-size:12px;">الكويزات</div></div>
+            </div>
+            <div style="background:var(--primary);color:white;padding:20px;border-radius:12px;">
+                <div style="font-size:14px;opacity:0.8;">الإجمالي</div>
+                <div id="progTotal" style="font-size:32px;font-weight:900;">0</div>
+            </div>
+            <button onclick="document.getElementById('studentProgressModal').style.display='none'" style="margin-top:20px;padding:12px 30px;background:var(--accent);border:none;border-radius:10px;font-weight:700;cursor:pointer;">إغلاق</button>
+        </div>
+    </div>
 
         <div class="cross-group-only"
             style="background: var(--card-bg); padding: 15px; border-radius: 16px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); text-align:center; box-shadow: 0 10px 20px rgba(0,0,0,0.05);">
@@ -885,17 +902,17 @@
         </div>
 
         <!-- Attendance Dashboard -->
-        <div id="view-attendList" class="view-section">
+<div id="view-attendList" class="view-section">
             <div style="max-width: 600px; margin: auto;">
-                <h3 style="color:var(--accent); text-align:center; font-size:22px; font-weight:800; margin-bottom:15px;">📊 سجل الحضور</h3>
+                <h3 style="color:var(--accent); text-align:center; font-size:22px; font-weight:800; margin-bottom:15px;">📊 لوحة المتدربين</h3>
                 
-                <!-- Single Lecture Filter -->
-                <div style="margin-bottom: 20px;">
-                    <label style="font-size:13px; font-weight:bold; color:var(--text-muted);">اختر المحاضرة</label>
-                    <select id="singleLecture" style="margin-bottom:0;" onchange="loadSingleLectureAttend()">
-                        <script>for (let i = 1; i <= 20; i++) document.write(`<option value="${i}">المحاضرة ${i}</option>`);</script>
-                    </select>
+                <input type="text" id="dashboardSearch" placeholder="بحث بالاسم أو الكود..." onkeyup="filterDashboard()" style="margin-bottom:20px;">
+                
+                <div class="students-grid" id="dashboardGrid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:15px;">
+                    <div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-muted);">اضغط عرض لتحميل البيانات</div>
                 </div>
+            </div>
+        </div>
                 
                 <button class="btn-submit" onclick="loadSingleLectureAttend()">🔄 تحميل</button>
                 
@@ -1668,54 +1685,97 @@ function submitData() {
         let allAttendList = [];
         
         async function loadSingleLectureAttend() {
-            const lec = document.getElementById('singleLecture').value;
+            // Load all student data for dashboard
             const auth = getAuthParams();
             const centralApi = getEffectiveApi(GRADES_API);
             
-            showLoader(true, `جاري تحميل حضور المحاضرة ${lec}...`);
+            showLoader(true, "جاري تحميل بيانات المتدربين...");
             
             try {
-                const res = await fetch(`${centralApi}?action=getTop&fromLec=${lec}&toLec=${lec}&weight=15${auth}`).then(r => r.json());
+                const [attend, tasks, quizzes] = await Promise.all([
+                    fetch(`${centralApi}?action=getTop&fromLec=1&toLec=20&weight=15${auth}`).then(r => r.json()),
+                    fetch(`${centralApi}?action=getTop&fromTask=1&toTask=17${auth}`).then(r => r.json()),
+                    fetch(`${centralApi}?action=getTop&fromQuiz=1&toQuiz=17${auth}`).then(r => r.json())
+                ]);
                 
-                if (res.status === "success" && res.scores) {
-                    allAttendList = res.scores.sort((a, b) => (b.total || 0) - (a.total || 0));
-                    renderSingleAttend(lec);
-                } else {
-                    showToast("❌ لا توجد بيانات", "error");
-                }
+                // Merge all scores
+                const scoreMap = {};
+                
+                const mergeScores = (data, type, weight = 1) => {
+                    if (data.scores) {
+                        data.scores.forEach(s => {
+                            if (!scoreMap[s.id]) scoreMap[s.id] = { id: s.id, name: s.name, attend: 0, tasks: 0, quiz: 0 };
+                            scoreMap[s.id][type] = parseFloat(s.total) || 0;
+                        });
+                    }
+                };
+                
+                mergeScores(attend, 'attend');
+                mergeScores(tasks, 'tasks');
+                mergeScores(quizzes, 'quiz');
+                
+                window.dashboardStudents = Object.values(scoreMap).sort((a, b) => (b.attend + b.tasks + b.quiz) - (a.attend + a.tasks + a.quiz));
+                renderDashboard(window.dashboardStudents);
+                
             } catch (e) {
-                showToast("❌ خطأ في الاتصال", "error");
+                console.error(e);
+                showToast("❌ خطأ في تحميل البيانات", "error");
             }
             
             showLoader(false);
         }
         
-        function renderSingleAttend(lec) {
-            const tbody = document.getElementById('attendListBody');
+        function renderDashboard(students) {
+            const grid = document.getElementById('dashboardGrid');
             
-            if (!allAttendList.length) {
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px;">لا توجد بيانات</td></tr>';
+            if (!students.length) {
+                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--text-muted);">لا توجد بيانات</div>';
                 return;
             }
             
-            let html = '';
-            allAttendList.forEach(s => {
-                const present = s.total > 0;
-                const statusBg = present ? '#10b981' : '#fee2e2';
-                const statusColor = present ? '#fff' : '#ef4444';
-                const statusIcon = present ? '✓ حاضر' : '✕ غائب';
-                
-                html += `<tr style="background:${present ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)'};">
-                    <td style="font-weight:800; font-family:monospace;">${s.id}</td>
-                    <td style="font-weight:600;">${s.name || '-'}</td>
-                    <td>
-                        <span style="background:${statusBg}; color:${statusColor}; padding:6px 14px; border-radius:20px; font-weight:800; font-size:14px;">
-                            ${statusIcon}
-                        </span>
-                    </td>
-                </tr>`;
-            });
-            tbody.innerHTML = html;
+            grid.innerHTML = students.map(s => {
+                const total = s.attend + s.tasks + s.quiz;
+                return `<div class="student-card" onclick="showStudentProgress('${s.id}')" style="background:var(--card-bg);padding:20px;border-radius:16px;cursor:pointer;transition:0.3s;">
+                    <div style="font-family:monospace;font-weight:800;color:var(--electric-blue);font-size:14px;">${s.id}</div>
+                    <div style="font-weight:700;font-size:16px;margin:8px 0;">${s.name || '-'}</div>
+                    <div style="display:flex;gap:8px;font-size:12px;font-weight:700;">
+                        <span style="background:#dbeafe;color:#1d4ed8;padding:6px 10px;border-radius:8px;">✓ ${s.attend}</span>
+                        <span style="background:#dcfce7;color:#15803d;padding:6px 10px;border-radius:8px;">📝 ${s.tasks}</span>
+                        <span style="background:#fef3c7;color:#b45309;padding:6px 10px;border-radius:8px;">📋 ${s.quiz}</span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+        
+        function filterDashboard() {
+            const query = document.getElementById('dashboardSearch').value.toLowerCase();
+            if (!window.dashboardStudents) return;
+            const filtered = window.dashboardStudents.filter(s => 
+                (s.name || '').toLowerCase().includes(query) || 
+                (s.id || '').toLowerCase().includes(query)
+            );
+            renderDashboard(filtered);
+        }
+        
+        // Add click handler to show student modal
+        function showStudentProgress(code) {
+            const student = window.dashboardStudents?.find(s => s.id === code);
+            if (!student) return;
+            
+            // Update modal
+            document.getElementById('progressStudentName').innerText = student.name || code;
+            document.getElementById('progAttend').innerText = student.attend;
+            document.getElementById('progTasks').innerText = student.tasks;
+            document.getElementById('progQuizzes').innerText = student.quiz;
+            
+            const total = student.attend + student.tasks + student.quiz;
+            document.getElementById('progTotal').innerText = total;
+            
+            // Show modal
+            const modal = document.getElementById('studentProgressModal');
+            if (modal) {
+                modal.style.display = 'flex';
+            }
         }
 
         function playBeep(type) {
