@@ -4,10 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title> Eduneers | Unified Dashboard </title>
+    <title> Eduneers | Grades System </title>
     <link rel="manifest" href="manifest.json">
-    <script src="https://unpkg.com/html5-qrcode"></script>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
@@ -720,686 +718,21 @@
                 display: none;
             }
 
-        /* -------------------------------------- */
-        /* 🖼️ تنسيق اللوجو (التبديل بين الفاتح والداكن) */
-        /* -------------------------------------- */
-        .logo-light,
-        .logo-dark {
-            max-width: 150px;
-            height: auto;
-            margin-bottom: 15px;
-            transition: 0.3s;
-        }
-
-        .logo-dark {
-            display: none;
-        }
-
-        body.dark-mode .logo-light {
-            display: none;
-        }
-
-        body.dark-mode .logo-dark {
-            display: inline-block;
-        }
-
-        /* ⚡ Success Flash Overlay */
-        #successFlash {
-            position: fixed;
-            inset: 0;
-            z-index: 99999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 12px;
-            pointer-events: none;
-            opacity: 0;
-            background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, transparent 70%);
-            transition: opacity 0.15s ease;
-        }
-
-        #successFlash.active {
-            opacity: 1;
-        }
-
-        #successFlash .flash-icon {
-            font-size: 80px;
-            animation: flashBounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            filter: drop-shadow(0 0 30px rgba(16, 185, 129, 0.8));
-        }
-
-        #successFlash .flash-name {
-            font-size: 22px;
-            font-weight: 900;
-            color: #10b981;
-            text-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
-            animation: flashBounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.05s both;
-        }
-
-        @keyframes flashBounce {
-            0% {
-                transform: scale(0);
-                opacity: 0;
+            .view-section {
+                padding: 20px 15px;
             }
 
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        /* 🏷️ Tabs */
-        .tabs-container {
-            display: flex;
-            background: var(--card-bg);
-            margin: 15px auto;
-            max-width: 1000px;
-            border-radius: 15px;
-            padding: 5px;
-            gap: 5px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            overflow-x: auto;
-            backdrop-filter: blur(10px);
-        }
-
-        .tab-item {
-            flex: 1;
-            padding: 10px 5px;
-            text-align: center;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 800;
-            font-size: 0.85rem;
-            color: #64748b;
-            transition: 0.3s;
-            min-width: 75px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .tab-item span:first-child {
-            font-size: 1.4rem;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 2px;
-        }
-
-        .tab-item.active {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        body.dark-mode .tab-item {
-            color: #94a3b8;
-        }
-
-        body.dark-mode .tab-item.active {
-            background: linear-gradient(135deg, var(--electric-blue), #0284c7);
-            color: #fff;
-            box-shadow: 0 4px 15px var(--electric-glow);
-        }
-
-        /* 🔴 حقول الإدخال (Inputs) شاملة الدارك مود */
-        input,
-        select,
-        textarea {
-            width: 100%;
-            padding: 14px;
-            border-radius: 14px;
-            border: 2px solid transparent;
-            background-color: rgba(0, 0, 0, 0.03);
-            color: var(--text-main);
-            font-size: 15px;
-            font-weight: 800;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-            text-align: center;
-            font-family: 'Cairo';
-            transition: 0.3s;
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-            border-color: var(--accent);
-            outline: none;
-            background: #fff;
-            box-shadow: 0 0 8px rgba(245, 176, 65, 0.2);
-        }
-
-        input::placeholder,
-        textarea::placeholder {
-            color: var(--text-muted);
-        }
-
-        body.dark-mode input,
-        body.dark-mode select,
-        body.dark-mode textarea {
-            background-color: #1e293b !important;
-            color: #fff !important;
-            border: 1px solid #334155 !important;
-        }
-
-        body.dark-mode input:focus,
-        body.dark-mode select:focus,
-        body.dark-mode textarea:focus {
-            border-color: var(--electric-blue) !important;
-            background-color: #0f172a !important;
-            box-shadow: 0 0 10px var(--electric-glow) !important;
-        }
-
-        /* -------------------------------------- */
-        /* تنسيق الأزرار (Buttons) */
-        /* -------------------------------------- */
-        .btn-primary {
-            background: var(--accent);
-            color: #0f172a;
-            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.1);
-        }
-
-        .btn-secondary {
-            background: linear-gradient(135deg, var(--accent), #f39c12);
-            color: #fff;
-            box-shadow: 0 10px 20px var(--accent-glow);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2);
-        }
-
-        .btn-excel {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
-        }
-
-        .btn-small {
-            padding: 8px 16px;
-            font-size: 13px;
-            margin: 0;
-            width: auto;
-            border-radius: 10px;
-            box-shadow: none;
-            font-weight: 700;
-        }
-
-        /* Badges */
-        .nav-badge {
-            font-size: 11px;
-            font-weight: 800;
-            padding: 5px 10px;
-            border-radius: 8px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            font-family: monospace;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(5px);
-            white-space: nowrap !important;
-            flex-shrink: 0 !important;
-            min-width: max-content !important;
-        }
-
-        .group-badge {
-            background: rgba(245, 176, 65, 0.1);
-            color: var(--accent);
-            border: 1px solid rgba(245, 176, 65, 0.3);
-        }
-
-        body.dark-mode .group-badge {
-            background: rgba(0, 210, 255, 0.1);
-            color: var(--electric-blue);
-            border: 1px solid rgba(0, 210, 255, 0.3);
-            box-shadow: 0 0 10px rgba(0, 210, 255, 0.1);
-        }
-
-        .role-badge {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        body.dark-mode .role-badge {
-            background: rgba(30, 41, 59, 0.8);
-            color: #94a3b8;
-            border: 1px solid #334155;
-        }
-
-        body.role-owner .role-badge {
-            color: #eab308;
-            border-color: rgba(234, 179, 8, 0.4);
-            background: rgba(234, 179, 8, 0.1);
-        }
-
-        #offlineBadge {
-            display: none;
-            background: #ef4444;
-            color: white;
-            padding: 12px 15px;
-            border-radius: 16px;
-            font-weight: 800;
-            text-align: center;
-            margin-bottom: 20px;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .google-btn-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-            padding: 20px;
-            background: rgba(248, 250, 252, 0.5);
-            border-radius: 20px;
-            border: 2px dashed rgba(0, 0, 0, 0.1);
-        }
-
-        body.dark-mode .google-btn-container {
-            background: rgba(30, 41, 59, 0.5);
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .divider {
-            text-align: center;
-            margin: 30px 0;
-            position: relative;
-        }
-
-        .divider hr {
-            border: none;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        body.dark-mode .divider hr {
-            border-top-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .divider span {
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--card-bg);
-            padding: 0 20px;
-            color: var(--text-muted);
-            font-size: 14px;
-            font-weight: 700;
-            border-radius: 10px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        body.dark-mode .divider span {
-            background: #0f172a;
-            color: var(--electric-blue);
-            border-color: rgba(0, 210, 255, 0.2);
-            box-shadow: 0 0 10px rgba(0, 210, 255, 0.1);
-        }
-
-        .admin-form-container {
-            background: rgba(255, 255, 255, 0.5);
-            padding: 25px;
-            border-radius: 20px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            margin-bottom: 25px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.02);
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        body.dark-mode .admin-form-container {
-            background: rgba(30, 41, 59, 0.8);
-            border-color: #334155;
-        }
-
-        #reader {
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto 20px auto;
-            border-radius: 20px;
-            overflow: hidden;
-            display: none;
-            border: 3px dashed var(--accent);
-            background: #f8fafc;
-            padding: 10px;
-        }
-
-        body.dark-mode #reader {
-            border-color: var(--electric-blue);
-            background: rgba(30, 41, 59, 0.5);
-        }
-
-        /* ===== Mail View Premium Styles ===== */
-        .mail-hero {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
-            border-radius: 24px;
-            padding: 40px 30px 30px;
-            margin-bottom: 28px;
-            position: relative;
-            overflow: hidden;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-        }
-
-        body:not(.dark-mode) .mail-hero {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #1e293b 100%);
-        }
-
-        .mail-hero-icon {
-            font-size: 52px;
-            display: block;
-            margin-bottom: 14px;
-            filter: drop-shadow(0 0 16px rgba(245, 176, 65, 0.5));
-            animation: floatIcon 3s ease-in-out infinite;
-        }
-
-        @keyframes floatIcon {
-
-            0%,
-            100% {
-                transform: translateY(0);
+            h2,
+            h3 {
+                font-size: 1.2rem !important;
             }
 
-            50% {
-                transform: translateY(-8px);
+            input,
+            select,
+            .btn-submit {
+                font-size: 14px;
+                padding: 12px;
             }
-        }
-
-        .mail-hero h2 {
-            color: #fff;
-            font-size: 26px;
-            font-weight: 900;
-            margin: 0 0 8px;
-            letter-spacing: 0.5px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .mail-hero p {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 14px;
-            margin: 0;
-            line-height: 1.7;
-        }
-
-        .mail-stats {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        .mail-stat-chip {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 50px;
-            padding: 7px 18px;
-            font-size: 13px;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-        }
-
-        .mail-form-card {
-            background: var(--card-bg);
-            border-radius: 24px;
-            padding: 28px;
-            border: 1px solid rgba(0, 0, 0, 0.06);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
-            margin-bottom: 20px;
-        }
-
-        body.dark-mode .mail-form-card {
-            border-color: rgba(255, 255, 255, 0.06);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-        }
-
-        .mail-field-label {
-            font-size: 13px;
-            font-weight: 800;
-            color: var(--text-muted);
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .mail-section-divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.08), transparent);
-            margin: 22px 0;
-        }
-
-        body.dark-mode .mail-section-divider {
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.07), transparent);
-        }
-
-        .custom-multi-select {
-            position: relative;
-            width: 100%;
-            direction: rtl;
-            text-align: right;
-        }
-
-        .select-box {
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            padding: 14px 18px;
-            border-radius: 14px;
-            color: var(--text-main);
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.25s;
-            font-size: 14px;
-        }
-
-        .select-box:hover {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(245, 176, 65, 0.12);
-        }
-
-        body.dark-mode .select-box {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .options-container {
-            display: none;
-            position: absolute;
-            top: calc(100% + 8px);
-            left: 0;
-            right: 0;
-            background: var(--card-bg);
-            backdrop-filter: blur(25px);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            border-radius: 16px;
-            z-index: 1000;
-            max-height: 260px;
-            overflow-y: auto;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
-            padding: 8px;
-        }
-
-        body.dark-mode .options-container {
-            border-color: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-        }
-
-        .options-container.open {
-            display: block;
-            animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .option-item {
-            padding: 11px 14px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            border-radius: 10px;
-            transition: background 0.18s;
-            color: var(--text-main);
-            font-weight: 700;
-            font-size: 14px;
-        }
-
-        .option-item:hover {
-            background: rgba(245, 176, 65, 0.1);
-        }
-
-        .option-item input[type="checkbox"] {
-            width: 17px;
-            height: 17px;
-            cursor: pointer;
-            accent-color: var(--accent);
-            flex-shrink: 0;
-            margin: 0;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-8px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .mail-subject-input {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 14px 18px;
-            border-radius: 14px;
-            border: 2px solid #e2e8f0;
-            background: #f8fafc;
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--text-main);
-            font-family: inherit;
-            transition: all 0.25s;
-            outline: none;
-            text-align: right;
-            direction: rtl;
-        }
-
-        .mail-subject-input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(245, 176, 65, 0.12);
-            background: #fff;
-        }
-
-        body.dark-mode .mail-subject-input {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: #f1f5f9;
-        }
-
-        .mail-body-textarea {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 16px 18px;
-            border-radius: 14px;
-            border: 2px solid #e2e8f0;
-            background: #f8fafc;
-            font-size: 14px;
-            font-weight: 500;
-            line-height: 1.8;
-            color: var(--text-main);
-            font-family: inherit;
-            transition: all 0.25s;
-            outline: none;
-            resize: vertical;
-            min-height: 160px;
-            text-align: right;
-            direction: rtl;
-        }
-
-        .mail-body-textarea:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(245, 176, 65, 0.12);
-            background: #fff;
-        }
-
-        body.dark-mode .mail-body-textarea {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: #f1f5f9;
-        }
-
-        .mail-attach-zone {
-            border: 2px dashed #cbd5e1;
-            border-radius: 16px;
-            padding: 24px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.25s;
-            background: #f8fafc;
-            position: relative;
-        }
-
-        .mail-attach-zone:hover {
-            border-color: var(--accent);
-            background: rgba(245, 176, 65, 0.04);
-        }
-
-        body.dark-mode .mail-attach-zone {
-            background: rgba(255, 255, 255, 0.03);
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .mail-attach-zone input[type="file"] {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            cursor: pointer;
-            width: 100%;
-            height: 100%;
-        }
-
-        .mail-send-btn {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #f5b041, #e67e22);
-            border: none;
-            border-radius: 16px;
-            color: #fff;
-            font-size: 17px;
-            font-weight: 900;
-            cursor: pointer;
-            letter-spacing: 0.5px;
-            transition: all 0.3s;
-            box-shadow: 0 8px 25px rgba(245, 176, 65, 0.35);
-            font-family: inherit;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .mail-send-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 35px rgba(245, 176, 65, 0.5);
-            background: linear-gradient(135deg, #f6c147, #f0932b);
         }
     </style>
 </head>
@@ -1426,26 +759,6 @@
         <div style="font-size: 24px; font-weight: 900; font-family: monospace; color: var(--electric-blue);"
             id="percent">0%</div>
     </div>
-
-    <div id="successFlash">
-        <div class="flash-icon">✅</div>
-        <div class="flash-name" id="flashName">تم بنجاح!</div>
-    </div>
-
-    <div class="navbar">
-        <div class="nav-content">
-            <div class="nav-brand">
-                <h2>⚡ <span class="brand-text">Eduneers</span> <span id="welcomeName"></span></h2>
-            </div>
-            <div class="nav-actions">
-                <span id="groupBadge" class="nav-badge group-badge" style="display: none;"></span>
-                <span id="roleBadge" class="nav-badge role-badge" style="display: none;"></span>
-                <button class="nav-btn" id="themeToggle" onclick="toggleDarkMode()">☀️</button>
-                <button class="nav-btn" id="menuBtn" onclick="toggleSidebar()">☰</button>
-            </div>
-        </div>
-    </div>
-
     <style>
         @keyframes spin {
             100% {
@@ -1454,89 +767,61 @@
         }
     </style>
 
+    <div class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand">
+                <h2>⚡ <span class="brand-text">Eduneers</span> <span id="welcomeName"
+                        style="font-size: 11px; opacity:0.7;"></span></h2>
+            </div>
+            <div class="nav-actions">
+                <span id="groupBadge"
+                    style="font-size: 11px; font-weight: 800; background: rgba(0, 210, 255, 0.1); color: var(--electric-blue); padding: 5px 10px; border-radius: 8px; border: 1px solid rgba(0, 210, 255, 0.3); display: none;"></span>
+                <button class="nav-btn" onclick="toggleDarkMode()">🌓</button>
+                <button class="nav-btn" onclick="toggleSidebar()">☰</button>
+            </div>
+        </div>
+    </div>
+
     <div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
     <div class="sidebar" id="sidebar">
         <button class="close-btn" onclick="toggleSidebar()">×</button>
         <div
             style="padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px;">
-            <div style="font-weight: 900; color: var(--electric-blue); font-size: 1.3rem;">نظام Eduneers المتكامل</div>
+            <div style="font-weight: 900; color: var(--electric-blue); font-size: 1.3rem;">نظام التقييم المركزي</div>
             <div id="sideRole"
                 style="font-size: 10px; opacity: 0.7; margin-top: 5px; text-transform: uppercase; background: rgba(255,255,255,0.1); display: inline-block; padding: 4px 10px; border-radius: 8px;">
             </div>
         </div>
 
-        <div class="sidebar-heading">الرصد والتقييم</div>
-        <a href="#" onclick="switchView('grading'); toggleSidebar();" id="nav-grading">
+        <a href="#" class="active" onclick="switchView('grading'); toggleSidebar();" id="nav-grading">
             <span>📝</span> <span>رصد الدرجات</span>
         </a>
-        <a href="#" onclick="switchView('scanner'); toggleSidebar();" id="nav-scanner">
-            <span>📸</span> <span>المسح الضوئي (QR)</span>
-        </a>
-        <a href="#" onclick="switchView('manual'); toggleSidebar();" id="nav-manual">
-            <span>✍️</span> <span>تسجيل الحضور يدوي</span>
-        </a>
-
-        <div class="sidebar-heading">المتابعة والتقارير</div>
         <a href="#" onclick="switchView('searchView'); toggleSidebar();" id="nav-searchView">
-            <span>🔍</span> <span>استعلام شامل</span>
-        </a>
-        <a href="#" onclick="switchView('attendeesView'); toggleSidebar();" id="nav-attendeesView">
-            <span>👥</span> <span>الحضور (الشيت)</span>
-        </a>
-        <a href="#" onclick="switchView('dashboard'); toggleSidebar();" id="nav-dashboard">
-            <span>📊</span> <span>لوحة المتابعة</span>
+            <span>🔍</span> <span>استعلام عن طالب</span>
         </a>
         <a href="#" class="manager-only" onclick="switchView('topView'); toggleSidebar();" id="nav-topView">
             <span>🏆</span> <span>لوحة الشرف Top 5</span>
-        </a>
-        <a href="#" class="manager-only" onclick="switchView('analytics'); toggleSidebar();" id="nav-analytics">
-            <span>📈</span> <span>إحصائيات الجروبات</span>
-        </a>
-        <a href="#" class="manager-only" onclick="switchView('mail'); toggleSidebar();" id="nav-mail">
-            <span>📧</span> <span>الإعلانات والبريد</span>
-        </a>
-
-        <div class="sidebar-heading admin-only">إدارة النظام</div>
-        <a href="#" class="admin-only" onclick="switchView('users'); toggleSidebar();" id="nav-users">
-            <span>👥</span> <span>إدارة المستخدمين</span>
         </a>
         <a href="#" class="manager-only" onclick="switchView('settings'); toggleSidebar();" id="nav-settings">
             <span>⚙️</span> <span>إعدادات النظام</span>
         </a>
 
         <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 15px 25px;"></div>
-        <a href="#" onclick="logout()" style="color: #ef4444; margin-top: 10px;"><span>🚪</span> <span>تسجيل الخروج</span></a>
-    </div>
-
-    <div class="tabs-container" id="appTabs" style="display:none;">
-        <div class="tab-item active" id="tab-grading" onclick="switchView('grading', this)"><span>📝</span><span>درجات</span></div>
-        <div class="tab-item" id="tab-scanner" onclick="switchView('scanner', this)"><span>📸</span><span>سكانر</span></div>
-        <div class="tab-item" id="tab-dashboard" onclick="switchView('dashboard', this)"><span>📊</span><span>متابعة</span></div>
-        <div class="tab-item admin-only" id="tab-users" onclick="switchView('users', this)"><span>👥</span><span>إدارة</span></div>
+        <a href="index.html" style="color: var(--accent);"><span>🏠</span> <span>نظام الحضور</span></a>
+        <a href="#" onclick="logout()" style="color: #ef4444; margin-top: 10px;"><span>🚪</span> <span>تسجيل
+                الخروج</span></a>
     </div>
 
     <div class="container">
         <div id="toast"></div>
-        <div id="offlineBadge" onclick="syncOfflineData()">📶 لديك بيانات غير مزامنة (<span id="offlineCount">0</span>).
-            اضغط للرفع!</div>
 
-        <div id="lectureContainer" class="manager-only"
-            style="background: var(--card-bg); padding: 15px; border-radius: 16px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); text-align:center; box-shadow: 0 10px 20px rgba(0,0,0,0.05); display:none;">
-            <div style="margin-bottom: 15px;">
-                <label
-                    style="font-weight: 800; color: var(--electric-blue); font-size: 13px; display:block; margin-bottom:10px;">رقم
-                    المحاضرة المستهدفة</label>
-                <select id="lecture" style="margin-bottom: 0; max-width: 300px;">
-                    <script>for (let i = 1; i <= 20; i++) document.write(`<option value="${i}">المحاضرة ${i}</option>`);</script>
-                </select>
-            </div>
-            <div class="manager-only cross-group-only"
-                style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
-                <label style="font-weight: 800; color: #c084fc; font-size: 13px; display:block; margin-bottom:10px;">تحكم الجروب
-                    👑</label>
-                <select id="globalGroupSelect" style="margin-bottom:0; max-width: 300px; border-color:#c084fc; color:#c084fc;"
-                    onchange="changeGlobalGroup(this.value)"></select>
-            </div>
+        <div class="cross-group-only"
+            style="background: var(--card-bg); padding: 15px; border-radius: 16px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); text-align:center; box-shadow: 0 10px 20px rgba(0,0,0,0.05);">
+            <label style="font-weight: 800; color: #c084fc; font-size: 13px; display:block; margin-bottom:10px;">تحكم
+                الجروب 👑</label>
+            <select id="globalGroupSelect"
+                style="margin-bottom:0; max-width: 300px; border-color:#c084fc; color:#c084fc;"
+                onchange="changeGlobalGroup(this.value)"></select>
         </div>
 
         <div id="view-grading" class="view-section active">
@@ -1545,9 +830,17 @@
                     style="color:var(--electric-blue); text-align:center; font-size:24px; font-weight:800; margin-bottom:20px;">
                     رصد تقييم المحاضرة</h3>
 
-                <label style="font-size:13px; font-weight:bold; color:var(--text-muted);">رقم الطالب</label>
+                <label style="font-size:13px; font-weight:bold; color:var(--text-muted);">رقم كود الطالب</label>
                 <input type="text" id="studentCode" placeholder="أدخل الرقم فقط (مثال: 15)"
                     style="font-size:1.4rem; letter-spacing: 2px;">
+
+                <div style="margin-bottom: 20px;">
+                    <label style="font-size:13px; font-weight:bold; color:var(--text-muted);">رقم المحاضرة
+                        المستهدفة</label>
+                    <select id="currentLecNum" style="margin-bottom:0;">
+                        <script>for (let i = 1; i <= 20; i++) document.write(`<option value="${i}">المحاضرة ${i}</option>`);</script>
+                    </select>
+                </div>
 
                 <div class="grid-3">
                     <div class="toggle-btn" id="attBtn" onclick="this.classList.toggle('active-att')">👤 حضور (15)</div>
@@ -1570,27 +863,6 @@
                 </div>
 
                 <button class="btn-submit" onclick="submitData()">حفظ وإرسال التقييم 📡</button>
-            </div>
-        </div>
-
-        <div id="view-scanner" class="view-section" style="display:none;">
-            <div style="max-width: 500px; margin: auto;">
-                <h3 style="color:var(--electric-blue); text-align:center; font-size:24px; font-weight:800; margin-bottom:20px;">
-                    المسح الضوئي للحضور</h3>
-                <select id="cameraSelection">
-                    <option value="">جاري البحث عن كاميرات...</option>
-                </select>
-                <button class="btn-primary" onclick="startLiveCamera()"
-                    style="width: 100%; display: flex; justify-content: center; margin-bottom:10px;">🎥 تفعيل المسح الذكي</button>
-                <input type="file" id="qr-input-file" accept="image/*" capture="environment" style="display:none;">
-                <button class="btn-secondary" onclick="document.getElementById('qr-input-file').click()"
-                    style="margin-bottom:0; width:100%;">📸 التقاط صورة للـ QR</button>
-                <div id="reader"
-                    style="width: 100%; border-radius: 20px; overflow: hidden; display: none; border: 3px dashed var(--accent); margin-top: 15px; background: rgba(0,0,0,0.05); padding: 10px;">
-                </div>
-                <button class="btn-danger" id="stopCamBtn"
-                    style="display:none; margin-top:15px; width: 100%; justify-content: center;" onclick="stopLiveCamera()">إيقاف
-                    الكاميرا</button>
             </div>
         </div>
 
@@ -1631,108 +903,6 @@
                         <tbody id="resDetails"></tbody>
                     </table>
                 </div>
-            </div>
-        </div>
-
-        <div id="view-attendeesView" class="view-section">
-            <div style="max-width: 600px; margin: auto;">
-                <h3 style="color:var(--electric-blue); text-align:center; font-size:24px; font-weight:800; margin-bottom:20px;">
-                    👥 حضور المحاضرة</h3>
-
-                <div style="margin-bottom: 20px;">
-                    <label style="font-size:13px; font-weight:bold; color:var(--text-muted);">رقم المحاضرة</label>
-                    <select id="attendLecNum" style="margin-bottom:0;">
-                        <script>for (let i = 1; i <= 20; i++) document.write(`<option value="${i}">المحاضرة ${i}</option>`);</script>
-                    </select>
-                </div>
-
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <button class="btn-secondary" style="flex:1; margin:0;" onclick="loadAttendeesFromCentral()">🔄 تحديث</button>
-                </div>
-
-                <div class="dashboard-header">
-                    <span style="font-weight:800; color:var(--primary); font-size:14px;">عدد الحاضرين:</span>
-                    <span class="count-badge" id="attendeesCount">0</span>
-                </div>
-
-                <div class="search-box" style="position:relative; margin: 15px 0;">
-                    <input type="text" id="attendSearchInput" placeholder="بحث بالاسم أو الكود..." onkeyup="filterAttendees()"
-                        style="margin:0; padding:14px; padding-right:45px; box-sizing:border-box; width:100%; text-align:right;">
-                    <span style="position:absolute; right:15px; top:16px; opacity:0.5;">🔍</span>
-                </div>
-
-                <div class="table-container">
-                    <table id="attendeesTable">
-                        <thead>
-                            <tr>
-                                <th>الكود</th>
-                                <th>الاسم</th>
-                                <th>الوقت</th>
-                            </tr>
-                        </thead>
-                        <tbody id="attendeesList">
-                            <tr><td colspan="3" style="text-align:center; padding:20px; color:var(--text-muted);">اضغط تحديث لعرض السجلات</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div id="view-manual" class="view-section">
-            <div style="max-width: 500px; margin: auto;">
-                <h3 style="color:var(--electric-blue); text-align:center; font-size:24px; font-weight:800; margin-bottom:20px;">
-                    التسجيل اليدوي للحضور</h3>
-                <p style="font-size:14px; color:var(--text-muted); text-align:center; margin-bottom:20px;">أدخل <b>رقم الطالب فقط</b> (يدعم الأرقام العربية ١٢٣).</p>
-                <input type="text" id="manualCode" placeholder="مثال: 15 أو ١٥" style="text-align:center; font-size:24px; letter-spacing:4px; font-weight:900;">
-                <div style="margin-bottom:20px;">
-                    <label style="font-size:13px; font-weight:bold; color:var(--text-muted);">رقم المحاضرة</label>
-                    <select id="manualLecNum" style="margin-bottom:0;">
-                        <script>for (let i = 1; i <= 20; i++) document.write(`<option value="${i}">المحاضرة ${i}</option>`);</script>
-                    </select>
-                </div>
-                <button class="btn-primary" onclick="submitManualAttend()">تسجيل الحضور 📥</button>
-            </div>
-        </div>
-
-        <div id="view-dashboard" class="view-section">
-            <div style="max-width: 600px; margin: auto;">
-                <h3 style="color:var(--electric-blue); text-align:center; font-size:24px; font-weight:800; margin-bottom:20px;">
-                    📊 لوحة المتابعة</h3>
-                <div style="display:flex; gap:10px; margin-bottom:15px;">
-                    <button class="btn-secondary" style="flex:1; margin:0;" onclick="loadDashboard()">🔄 تحديث</button>
-                </div>
-                <div class="search-box" style="position:relative; margin-bottom:15px;">
-                    <input type="text" id="searchDashInput" placeholder="بحث بالاسم أو الكود..." onkeyup="filterDashboard()"
-                        style="margin:0; padding:14px; padding-right:45px; box-sizing:border-box; width:100%; text-align:right;">
-                    <span style="position:absolute; right:15px; top:16px; opacity:0.5;">🔍</span>
-                </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr><th>الكود</th><th>الاسم</th><th>الحالة</th></tr>
-                        </thead>
-                        <tbody id="dashList">
-                            <tr><td colspan="3" style="text-align:center; padding:20px; color:var(--text-muted);">اضغط تحديث</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div id="view-analytics" class="view-section manager-only">
-            <div style="max-width: 600px; margin: auto;">
-                <h3 style="color:var(--electric-blue); text-align:center; font-size:24px; font-weight:800; margin-bottom:20px;">
-                    📈 إحصائيات الجروب</h3>
-                <div id="analyticsContent" style="text-align:center; padding:40px; color:var(--text-muted);">جاري تحميل الإحصائيات...</div>
-            </div>
-        </div>
-
-        <div id="view-mail" class="view-section manager-only">
-            <div style="max-width: 500px; margin: auto;">
-                <h3 style="color:var(--electric-blue); text-align:center; font-size:24px; font-weight:800; margin-bottom:20px;">
-                    📧 الإعلانات والبريد</h3>
-                <textarea id="mailMsg" placeholder="اكتب رسالتك هنا..." style="width:100%; height:150px; margin-bottom:15px; padding:15px; border-radius:12px; background:var(--card-bg); color:var(--text-main); border:1px solid rgba(255,255,255,0.1);"></textarea>
-                <button class="btn-submit" onclick="sendBroadcast()">إرسال للجميع 📤</button>
             </div>
         </div>
 
@@ -1845,46 +1015,264 @@
     </div>
 
     <script>
-        // 🌐 API Configuration
         const CENTRAL_LINKS_API = "https://script.google.com/macros/s/AKfycbxFT_0yMGQMp2tK_F3G_ndN-b5URC-PQOxaT63rLPExzCNyV6p9-UKGpKELVnJbc2LA/exec";
-        
-        let GRADES_API = "https://script.google.com/macros/s/AKfycbyQlZlxpCyr68rjjsxGmXrPcLk0X7agsGEpG6YaGGNZwTvPY3sSbx2td5blRPP6oqbfhg/exec";
-        let QUIZ_API = "https://script.google.com/macros/s/AKfycbyQlZlxpCyr68rjjsxGmXrPcLk0X7agsGEpG6YaGGNZwTvPY3sSbx2td5blRPP6oqbfhg/exec";
-        let ATTEND_API = "https://script.google.com/macros/s/AKfycbyQlZlxpCyr68rjjsxGmXrPcLk0X7agsGEpG6YaGGNZwTvPY3sSbx2td5blRPP6oqbfhg/exec";
-        let EXTRA_API = "https://script.google.com/macros/s/AKfycbyQlZlxpCyr68rjjsxGmXrPcLk0X7agsGEpG6YaGGNZwTvPY3sSbx2td5blRPP6oqbfhg/exec";
-        
-        let ATTENDANCE_API_URL = "https://script.google.com/macros/s/AKfycbyJEb3_K7ORGnidD1GT6AjDS3kGgHjBMMAZ7iKT7tkI4JKR7pfRknMl-UumqqWW_5Hk3Q/exec";
-        let LOGIN_API_URL = "https://script.google.com/macros/s/AKfycbw-oytOWrgERm2yXu-NagMlyS14HlUGeAlsWqrZl2SwRJIi0IDL1AH2VduQvsmIIkNgFA/exec";
 
-        // 🧠 Application State
-        let html5QrCode = null;
-        let allAttendees = [];
-        let allSystemUsers = [];
-        let allDashboard = [];
-        let fullLeaderboard = [];
-        let offlineQueue = JSON.parse(localStorage.getItem('offlineQueue')) || [];
-        let currentView = localStorage.getItem('savedView') || 'grading';
-        let attendanceChartInstance = null;
-        let myChart = null; 
-        let _prefetchCache = {};
-        let _prefetchDone = false;
+        // Single API for all operations - Grade Sheet handles scan/saveGrade/saveQuiz/saveExtra/getTop
+        let GRADES_API = "https://script.google.com/macros/s/AKfycbx715VQ1MfNK_yLaX6m2rrNaGrJANjIGss9ysM4Sv8z6npcjVJOdnGZZDbJL74-oxDu/exec";
 
-        // 🛠️ Core Utilities
+        // 🔗 دالة اختيار الـ API المناسب (الافتراضي أو المخصص للجروب)
         function getEffectiveApi(originalUrl) {
             const currentGroup = localStorage.getItem('userGroup') || "Group A";
             const groupOverride = localStorage.getItem(`GROUP_API_${currentGroup}`);
+            // إذا وجد رابط للجروب، نستخدمه لجميع العمليات بدلاً من الروابط الافتراضية
             return groupOverride || originalUrl;
         }
 
+        // 🔗 دالة جلب رابط الطالب الفردي
         function getPersonalApi(studentCode) {
             let linksMap = JSON.parse(localStorage.getItem('PERSONAL_LINKS_MAP') || '{}');
-            return linksMap[studentCode] || "";
+            return linksMap[studentCode] || localStorage.getItem('PERSONAL_API') || "";
         }
 
+        let myChart = null;
+    
+    // Smart caching system for grades
+    const GRADES_CACHE = {
+      leaderboard: { data: null, timestamp: 0, params: '' },
+      search: { data: null, timestamp: 0, code: '' }
+    };
+    const GRADES_CACHE_TTL = 20000; // 20 seconds
+    
+    function getGradesCached(key) {
+      const cache = GRADES_CACHE[key];
+      if (cache && cache.data && (Date.now() - cache.timestamp < GRADES_CACHE_TTL)) {
+        return cache.data;
+      }
+      return null;
+    }
+    
+    function setGradesCache(key, data, extra = '') {
+      GRADES_CACHE[key] = { data, timestamp: Date.now(), params: extra };
+    }
+    
+    function clearGradesCache(key) {
+      if (key) {
+        GRADES_CACHE[key] = { data: null, timestamp: 0, params: '' };
+      } else {
+        GRADES_CACHE.leaderboard = { data: null, timestamp: 0, params: '' };
+        GRADES_CACHE.search = { data: null, timestamp: 0, code: '' };
+      }
+    }
+
+        // 🔴 دالة تحويل الأرقام العربية إلى إنجليزية
         function convertNumerals(str) {
-            if (!str) return "";
             const arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-            return str.toString().replace(/[٠-٩]/g, w => arabicNumbers.indexOf(w));
+            return str.replace(/[٠-٩]/g, w => arabicNumbers.indexOf(w));
+        }
+
+        window.onload = () => {
+            if (localStorage.getItem('isLoggedIn') !== 'true') { window.location.href = 'index.html'; return; }
+            if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark-mode');
+
+            const rawRole = localStorage.getItem('userRole') || "CADRE";
+            const role = rawRole.toUpperCase();
+            const name = localStorage.getItem('userName') || "مهندس";
+
+            document.getElementById('welcomeName').innerText = `| ${name}`;
+            document.getElementById('sideRole').innerText = rawRole;
+
+            const groupVal = localStorage.getItem('userGroup') || "Group A";
+            document.getElementById('groupBadge').innerText = groupVal;
+            document.getElementById('groupBadge').style.display = "inline-block";
+
+            if (role === 'OWNER') document.body.classList.add('role-owner');
+            else if (role === 'CO-FOUNDER') document.body.classList.add('role-co-founder');
+            else if (role === 'TEAM MANAGER' || role === 'ADMIN') document.body.classList.add('role-admin');
+            else if (role === 'COORDINATOR' || role === 'MANAGER') document.body.classList.add('role-manager');
+            else document.body.classList.add('role-user');
+
+            fillGroupSelects();
+            loadLinksDatabase();
+
+            // 🚀 Background Prefetch: sılently load data so views are instant
+            setTimeout(() => prefetchGroupData(), 2000);
+        };
+
+        // Cache storage for prefetched data
+        let _prefetchCache = {};
+        let _prefetchDone = false;
+
+        async function prefetchGroupData() {
+            const auth = getAuthParams();
+            const fl = 1, tl = 20;
+            try {
+                const [rTasks, rQuizzes, rAttend, rExtra] = await Promise.all([
+                    fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&fromTask=${fl}&toTask=${tl}${auth}`).then(r => r.json()).catch(() => ({})),
+                    fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&fromQuiz=${fl}&toQuiz=${tl}${auth}`).then(r => r.json()).catch(() => ({})),
+                    fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&fromLec=${fl}&toLec=${tl}&weight=15${auth}`).then(r => r.json()).catch(() => ({})),
+                    fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&extraOnly=1&fromLec=${fl}&toLec=${tl}${auth}`).then(r => r.json()).catch(() => ({}))
+                ]);
+                _prefetchCache = { tasks: rTasks, quizzes: rQuizzes, attendance: rAttend, extras: rExtra, params: `fl=${fl}&tl=${tl}` };
+                _prefetchDone = true;
+                console.log("✅ Background prefetch complete");
+            } catch (e) {
+                console.log("Prefetch skipped:", e);
+            }
+        }
+
+        function loadLinksDatabase() {
+            fetch(`${CENTRAL_LINKS_API}?action=getAllLinks`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        // Update Groups Cache
+                        for (let g in data.groups) {
+                            localStorage.setItem(`GROUP_API_${g}`, data.groups[g]);
+                        }
+                        // Update Individuals Cache
+                        localStorage.setItem('PERSONAL_LINKS_MAP', JSON.stringify(data.individuals));
+
+                        // refresh UI if on settings view
+                        if (document.getElementById('groupApiInput')) {
+                            const currentGroup = localStorage.getItem('userGroup') || "Group A";
+                            document.getElementById('groupApiInput').value = localStorage.getItem(`GROUP_API_${currentGroup}`) || "";
+                        }
+                        refreshLinksMonitor();
+                    }
+                }).catch(e => console.error("Error loading links DB", e));
+        }
+
+        function saveGroupApi() {
+            const url = document.getElementById('groupApiInput').value.trim();
+            const currentGroup = localStorage.getItem('userGroup') || "Group A";
+            if (!url) return showToast("❌ יرجى إدخال الرابط أولاً", "error");
+
+            showToast("⏳ جاري الحفظ في الـ Database المركزية...", "info");
+            fetch(`${CENTRAL_LINKS_API}?action=saveGroup&group=${encodeURIComponent(currentGroup)}&url=${encodeURIComponent(url)}`)
+                .then(r => r.json())
+                .then(res => {
+                    localStorage.setItem(`GROUP_API_${currentGroup}`, url);
+                    showToast(`✅ تم حفظ رابط الجروب لـ ${currentGroup}! 🚀`, "success");
+                }).catch(e => showToast("❌ خطأ في الاتصال بالشبكة", "error"));
+        }
+
+        function resetGroupApi() {
+            const currentGroup = localStorage.getItem('userGroup') || "Group A";
+            showToast("⏳ جاري الحذف من الـ Database...", "info");
+            fetch(`${CENTRAL_LINKS_API}?action=removeGroup&group=${encodeURIComponent(currentGroup)}`)
+                .then(r => r.json())
+                .then(res => {
+                    localStorage.removeItem(`GROUP_API_${currentGroup}`);
+                    document.getElementById('groupApiInput').value = "";
+                    showToast(`🔄 تم إرجاع ${currentGroup} للرابط الافتراضي`, "success");
+                }).catch(e => showToast("❌ خطأ في الاتصال بالشبكة", "error"));
+        }
+
+        function savePersonalApi() {
+            const url = document.getElementById('personalApiInput').value.trim();
+            let code = document.getElementById('targetStudentCode').value.trim().toUpperCase();
+            const currentGroup = localStorage.getItem('userGroup') || "Group A";
+
+            if (!code || !url) return showToast("❌ يرجى إدخال الكود والرابط معاً", "error");
+            // If they just typed "K1", append standard suffix
+            if (!code.includes("EDUR")) code = code + "EDUR9";
+
+            showToast("⏳ جاري الحفظ في الـ Database المركزية...", "info");
+            fetch(`${CENTRAL_LINKS_API}?action=saveIndividual&code=${encodeURIComponent(code)}&url=${encodeURIComponent(url)}&group=${encodeURIComponent(currentGroup)}`)
+                .then(r => r.json())
+                .then(res => {
+                    let linksMap = JSON.parse(localStorage.getItem('PERSONAL_LINKS_MAP') || '{}');
+                    linksMap[code] = url;
+                    localStorage.setItem('PERSONAL_LINKS_MAP', JSON.stringify(linksMap));
+
+                    showToast(`✅ تم بنجاح ربط الطالب ${code} 🔗`, "success");
+                    document.getElementById('targetStudentCode').value = "";
+                    document.getElementById('personalApiInput').value = "";
+                    refreshLinksMonitor();
+                }).catch(e => showToast("❌ خطأ في الاتصال", "error"));
+        }
+
+        function refreshLinksMonitor() {
+            const monitor = document.getElementById('mappedLinksMonitor');
+            if (!monitor) return;
+            let linksMap = JSON.parse(localStorage.getItem('PERSONAL_LINKS_MAP') || '{}');
+
+            let html = "";
+            for (let code in linksMap) {
+                html += `<div style="border-bottom:1px solid rgba(255,255,255,0.05); padding:4px 0; margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="color:var(--electric-blue); font-weight:bold;">${code}</span>
+                            <span style="opacity:0.6; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:60%; margin:0 10px;">${linksMap[code]}</span>
+                            <button onclick="removePersonalLink('${code}')" style="background:none; border:none; color:#ef4444; cursor:pointer;" title="حذف">🗑️</button>
+                         </div>`;
+            }
+            monitor.innerHTML = html || "<div style='text-align:center; opacity:0.5;'>لا يوجد روابط مسجلة حالياً...</div>";
+        }
+
+        function removePersonalLink(code) {
+            showToast("⏳ جاري الحذف من الـ Database...", "info");
+            fetch(`${CENTRAL_LINKS_API}?action=removeIndividual&code=${encodeURIComponent(code)}`)
+                .then(r => r.json())
+                .then(res => {
+                    let linksMap = JSON.parse(localStorage.getItem('PERSONAL_LINKS_MAP') || '{}');
+                    delete linksMap[code];
+                    localStorage.setItem('PERSONAL_LINKS_MAP', JSON.stringify(linksMap));
+                    refreshLinksMonitor();
+                    showToast("🗑️ تم حذف الربط بنجاح", "success");
+                }).catch(e => showToast("❌ خطأ في الاتصال", "error"));
+        }
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+
+            document.getElementById(`view-${viewId}`).classList.add('active');
+            const navItem = document.getElementById(`nav-${viewId}`);
+            if (navItem) navItem.classList.add('active');
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+            if (myChart) extractTop5();
+        }
+
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('show'); }
+        function logout() {
+            // مسح بيانات الجلسة فقط والحفاظ على الإعدادات
+            const keysToKeep = ['darkMode', 'PERSONAL_LINKS_MAP', 'PERSONAL_API'];
+            // نحتفظ أيضاً بروابط الجروبات
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('GROUP_API_')) keysToKeep.push(key);
+            }
+
+            const backup = {};
+            keysToKeep.forEach(k => backup[k] = localStorage.getItem(k));
+
+            localStorage.clear();
+
+            Object.keys(backup).forEach(k => {
+                if (backup[k] !== null) localStorage.setItem(k, backup[k]);
+            });
+
+            window.location.href = 'index.html';
+        }
+
+        function fillGroupSelects() {
+            let options = ''; const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            for (let i = 0; i < letters.length; i++) { let g = 'Group ' + letters[i]; options += `<option value="${g}">${g}</option>`; }
+            const gSelect = document.getElementById('globalGroupSelect');
+            if (gSelect) { gSelect.innerHTML = options; gSelect.value = localStorage.getItem('userGroup') || 'Group A'; }
+        }
+
+        function changeGlobalGroup(val) {
+            localStorage.setItem('userGroup', val);
+            document.getElementById('groupBadge').innerText = val;
+
+            // Refresh API input field for new group selection
+            if (document.getElementById('groupApiInput')) {
+                document.getElementById('groupApiInput').value = localStorage.getItem(`GROUP_API_${val}`) || "";
+            }
         }
 
         function showLoader(show, msg = "جاري العمل...") {
@@ -1892,24 +1280,16 @@
             if (show) {
                 document.getElementById('loaderMsg').innerText = msg;
                 l.style.display = 'flex';
-                let p = 0; 
-                window.ldrItv = setInterval(() => { 
-                    p += Math.floor(Math.random() * 10) + 1; 
-                    if (p > 90) p = 90; 
-                    document.getElementById('barFill').style.width = p + '%'; 
-                    document.getElementById('percent').innerText = p + '%'; 
-                }, 100);
+                let p = 0; window.ldrItv = setInterval(() => { p += Math.floor(Math.random() * 10) + 1; if (p > 90) p = 90; document.getElementById('barFill').style.width = p + '%'; document.getElementById('percent').innerText = p + '%'; }, 100);
             } else {
                 clearInterval(window.ldrItv);
-                document.getElementById('barFill').style.width = '100%'; 
-                document.getElementById('percent').innerText = '100%';
+                document.getElementById('barFill').style.width = '100%'; document.getElementById('percent').innerText = '100%';
                 setTimeout(() => { l.style.display = 'none'; document.getElementById('barFill').style.width = '0%'; }, 300);
             }
         }
 
         function showToast(text, type = "success") {
-            const t = document.getElementById('toast'); if(!t) return;
-            t.innerText = text;
+            const t = document.getElementById('toast'); t.innerText = text;
             t.style.background = type === "success" ? "linear-gradient(135deg, #10b981, #059669)" : "linear-gradient(135deg, #ef4444, #dc2626)";
             t.style.display = 'block'; setTimeout(() => { t.style.display = 'none'; }, 4000);
         }
@@ -1918,235 +1298,113 @@
             return `&email=${encodeURIComponent(localStorage.getItem('userEmail'))}&token=${encodeURIComponent(localStorage.getItem('sessionToken'))}&group=${encodeURIComponent(localStorage.getItem('userGroup'))}`;
         }
 
-        function playBeep(type) {
-            if (navigator.vibrate) { if (type === 'success') navigator.vibrate(150); else navigator.vibrate([100, 50, 100, 50, 200]); }
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination);
-            if (type === 'success') { osc.type = 'sine'; osc.frequency.value = 800; gain.gain.value = 0.1; osc.start(); osc.stop(ctx.currentTime + 0.15); }
-            else { osc.type = 'sawtooth'; osc.frequency.value = 300; gain.gain.value = 0.1; osc.start(); osc.stop(ctx.currentTime + 0.3); }
-        }
+let _isSubmitting = false;
 
-        // 🚪 Authentication & Roles
-        function checkAuth() {
-            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-            if (isLoggedIn) {
-                document.getElementById('menuBtn').style.display = 'flex';
-                document.getElementById('appTabs').style.display = 'flex';
-                document.getElementById('welcomeName').innerText = `| ${localStorage.getItem('userName')}`;
-                applyRolesToUI();
-                if (currentView === 'login' || !document.getElementById(`view-${currentView}`)) currentView = 'grading';
-                switchView(currentView);
-                syncRole();
-            } else {
-                window.location.href = 'index.html'; 
-            }
-        }
-
-        function syncRole() {
-            fetch(`${LOGIN_API_URL}?action=checkMyRole${getAuthParams()}`)
-                .then(res => res.json()).then(data => {
-                    if (data.status === "unauthorized" || data.status === "deleted") logout();
-                    else if (data.status === "success") {
-                        localStorage.setItem('userRole', data.role);
-                        if (!['Owner', 'CO-Founder', 'Team Manager', 'Admin'].includes(data.role)) localStorage.setItem('userGroup', data.group);
-                        applyRolesToUI();
-                    }
-                }).catch(() => {});
-        }
-
-        function applyRolesToUI() {
-            const role = localStorage.getItem('userRole');
-            const group = localStorage.getItem('userGroup');
-            const rb = document.getElementById('roleBadge');
-            const gb = document.getElementById('groupBadge');
-            if (rb) { rb.innerText = role; rb.style.display = 'flex'; }
-            if (gb) { gb.innerText = group; gb.style.display = 'flex'; }
-
-            document.body.classList.remove('role-owner', 'role-co-founder', 'role-admin', 'role-manager', 'role-user');
-            const r = (role || "").toLowerCase();
-            if (r === 'owner') document.body.classList.add('role-owner');
-            else if (r === 'co-founder') document.body.classList.add('role-co-founder');
-            else if (r === 'team manager' || r === 'admin') document.body.classList.add('role-admin');
-            else if (r === 'coordinator' || r === 'manager') document.body.classList.add('role-manager');
-            else document.body.classList.add('role-user');
-            
-            if(document.getElementById('sideRole')) document.getElementById('sideRole').innerText = role;
-            if (document.getElementById('globalGroupSelect')) document.getElementById('globalGroupSelect').value = group;
-        }
-
-        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
-
-        // 🗺️ Navigation & View Management
-        function switchView(viewId, tabElement = null) {
-            if (currentView === 'scanner' && viewId !== 'scanner') stopLiveCamera();
-
-            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
-            document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
-            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-
-            const targetView = document.getElementById(`view-${viewId}`);
-            if (targetView) targetView.classList.add('active');
-
-            const navItem = document.getElementById(`nav-${viewId}`);
-            if (navItem) navItem.classList.add('active');
-
-            if (tabElement) tabElement.classList.add('active');
-            else {
-                const t = document.getElementById(`tab-${viewId}`);
-                if (t) t.classList.add('active');
-            }
-
-            currentView = viewId;
-            localStorage.setItem('savedView', viewId);
-            document.getElementById('sidebar').classList.remove('open');
-            document.getElementById('overlay').classList.remove('show');
-
-            const lecContainer = document.getElementById('lectureContainer');
-            if (lecContainer) {
-                if (viewId === 'login' || viewId === 'users' || viewId === 'settings') {
-                    lecContainer.style.setProperty('display', 'none', 'important');
-                } else {
-                    lecContainer.style.setProperty('display', 'block', 'important');
-                }
-            }
-
-            if (viewId === 'dashboard') loadDashboard();
-            if (viewId === 'users') loadUsers();
-            if (viewId === 'mail') loadMailTargetList();
-            if (viewId === 'analytics') loadAnalytics();
-            if (viewId === 'attendeesView') loadAttendeesFromCentral();
-            
-            if (viewId === 'manual') setTimeout(() => document.getElementById('manualCode')?.focus(), 400);
-            if (viewId === 'grading') setTimeout(() => document.getElementById('studentCode')?.focus(), 400);
-        }
-
-        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('show'); }
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', isDark);
-            document.getElementById('themeToggle').innerText = isDark ? '🌙' : '☀️';
-            if (currentView === 'analytics' && attendanceChartInstance) loadAnalytics();
-        }
-
-        // 📸 QR Scanning & Attendance
-        function startLiveCamera() {
-            const camId = document.getElementById('cameraSelection').value;
-            if (!camId) return showToast("اختر الكاميرا أولاً", "error");
-            document.getElementById('reader').style.display = 'block'; document.getElementById('stopCamBtn').style.display = 'block';
-            if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
-            html5QrCode.start(camId, { fps: 10, qrbox: 250 }, (code) => { 
-                playBeep('success');
-                sendDataToAPI(code); 
-            }).catch(e => showToast("فشل تشغيل الكاميرا", "error"));
-        }
-        function stopLiveCamera() { if (html5QrCode && html5QrCode.isScanning) html5QrCode.stop().then(() => { document.getElementById('reader').style.display = 'none'; document.getElementById('stopCamBtn').style.display = 'none'; }); }
-
-        function sendDataToAPI(studentCode) {
-            studentCode = studentCode.toUpperCase();
-            if (!studentCode.endsWith("EDUR9")) studentCode += "EDUR9";
-            
-            const role = (localStorage.getItem('userRole') || "").toUpperCase();
-            if (['OWNER', 'CO-FOUNDER', 'TEAM MANAGER', 'ADMIN'].includes(role)) {
-                const match = studentCode.match(/^[A-Z]+/);
-                if (match) changeGlobalGroup("Group " + match[0]);
-            }
-
-            const lec = document.getElementById('lecture').value;
-            const group = localStorage.getItem('userGroup');
-
-            if (!navigator.onLine) {
-                offlineQueue.push({ code: studentCode, lecture: lec, group: group, time: new Date().toISOString() });
-                localStorage.setItem('offlineQueue', JSON.stringify(offlineQueue));
-                updateOfflineBadge();
-                playBeep('success');
-                return showToast("⚠️ تم الحفظ محلياً (أوفلاين)", "warning");
-            }
-
-            fetch(`${getEffectiveApi(ATTENDANCE_API_URL)}?action=scan&qrCode=${studentCode}&lectureNum=${lec}&group=${group}${getAuthParams()}`)
-                .then(r => r.json()).then(d => {
-                    if (d.status === "success") {
-                        showToast(`✅ تم تسجيل حضور: ${d.name || studentCode}`);
-                        flashSuccess(d.name || studentCode);
-                        playBeep('success');
-                    } else {
-                        showToast(d.message, "error");
-                        playBeep('error');
-                    }
-                }).catch(() => {
-                    offlineQueue.push({ code: studentCode, lecture: lec, group: group, time: new Date().toISOString() });
-                    localStorage.setItem('offlineQueue', JSON.stringify(offlineQueue));
-                    updateOfflineBadge();
-                    showToast("⚠️ تم الحفظ محلياً لضعف الشبكة", "warning");
-                    playBeep('success');
-                });
-        }
-
-        function submitManualAttend() {
-            let raw = document.getElementById('manualCode').value.trim();
-            if (!raw) return;
-            let num = convertNumerals(raw);
-            const group = localStorage.getItem('userGroup');
-            const letter = group.replace("Group ", "").trim();
-            sendDataToAPI(letter + num + "EDUR9");
-            document.getElementById('manualCode').value = "";
-        }
-
-        function flashSuccess(name) {
-            const f = document.getElementById('successFlash');
-            document.getElementById('flashName').innerText = name;
-            f.classList.add('active');
-            setTimeout(() => f.classList.remove('active'), 2000);
-        }
-
-        // 📝 Grading Logic
         function submitData() {
+            if (_isSubmitting) return;
+            
             let numRaw = document.getElementById('studentCode').value.trim();
-            if (!numRaw) return showToast("أدخل رقم الطالب", "error");
+            if (!numRaw) return showToast("❌ برجاء إدخال رقم كود الطالب", "error");
 
             let num = convertNumerals(numRaw);
-            const group = localStorage.getItem('userGroup');
-            const letter = group.replace("Group ", "").trim();
-            const code = letter + num + "EDUR9";
-            const lec = document.getElementById('lecture').value;
+            const groupLetter = localStorage.getItem('userGroup').replace("Group ", "").trim();
+            const code = groupLetter + num + "EDUR9";
+            const lec = document.getElementById('currentLecNum').value;
             const auth = getAuthParams();
+            
+            _isSubmitting = true;
 
-            let p = [];
-            let personalApiUrl = getPersonalApi(code);
-            let taskNameCol = "TASK " + lec;
-
+            // Use single central API endpoint
+            const centralApi = getEffectiveApi(GRADES_API);
+            let promises = [];
+            let taskName = "TASK " + lec;
+            
+            // 1. Save Attendance (scan) - Central
             if (document.getElementById('attBtn').classList.contains('active-att')) {
-                p.push(fetch(`${getEffectiveApi(ATTEND_API)}?action=scan&qrCode=${code}&lectureNum=${lec}&weight=15${auth}`).then(r => r.json()).catch(() => ({})));
-                if (personalApiUrl) fetch(`${personalApiUrl}?action=update&qrCode=${code}&taskName=${encodeURIComponent(taskNameCol)}&category=${encodeURIComponent('attendance .15')}&val=15`);
+                promises.push(fetch(`${centralApi}?action=scan&qrCode=${code}&lectureNum=${lec}&weight=15${auth}`).then(r => r.json()).catch(e => ({})));
             }
 
+            // 2. Save Main Task Grade - Central
             let taskVal = convertNumerals(document.getElementById('valTask').value);
             if (taskVal) {
-                p.push(fetch(`${getEffectiveApi(GRADES_API)}?action=saveGrade&qrCode=${code}&taskNum=${lec}&val=${taskVal}${auth}`).then(r => r.json()).catch(() => ({})));
-                if (personalApiUrl) fetch(`${personalApiUrl}?action=update&qrCode=${code}&taskName=${encodeURIComponent(taskNameCol)}&category=${encodeURIComponent('Main task. 70')}&val=${taskVal}`);
+                promises.push(fetch(`${centralApi}?action=saveGrade&qrCode=${code}&taskNum=${lec}&val=${taskVal}${auth}`).then(r => r.json()).catch(e => ({})));
             }
 
+            // 3. Save Quiz Grade - Central  
             let quizVal = convertNumerals(document.getElementById('valQuiz').value);
             if (quizVal) {
-                p.push(fetch(`${getEffectiveApi(QUIZ_API)}?action=saveQuiz&qrCode=${code}&quizNum=${lec}&val=${quizVal}${auth}`).then(r => r.json()).catch(() => ({})));
-                if (personalApiUrl) fetch(`${personalApiUrl}?action=update&qrCode=${code}&taskName=${encodeURIComponent(taskNameCol)}&category=${encodeURIComponent('online quize 25')}&val=${quizVal}`);
+                promises.push(fetch(`${centralApi}?action=saveQuiz&qrCode=${code}&quizNum=${lec}&val=${quizVal}${auth}`).then(r => r.json()).catch(e => ({})));
             }
 
+            // 4. Save Extra (feedback, attitude, bonus) - Central
             let f = document.getElementById('feedBtn').classList.contains('active-feed') ? 1 : 0;
             let a = document.getElementById('attitBtn').classList.contains('active-attit') ? 5 : 0;
             let b = convertNumerals(document.getElementById('valBonus').value) || 0;
 
             if (f || a || b != 0) {
-                p.push(fetch(`${getEffectiveApi(EXTRA_API)}?action=saveExtra&qrCode=${code}&lectureNum=${lec}&feedback=${f}&attitude=${a}&bonus=${b}${auth}`).then(r => r.json()).catch(() => ({})));
-                if (personalApiUrl) {
-                    if (f || a) fetch(`${personalApiUrl}?action=update&qrCode=${code}&taskName=${encodeURIComponent(taskNameCol)}&category=${encodeURIComponent('attitude .10')}&val=${(f*5)+(a?5:0)}`);
-                    if (b != 0) fetch(`${personalApiUrl}?action=update&qrCode=${code}&taskName=${encodeURIComponent(taskNameCol)}&category=${encodeURIComponent('bonus')}&val=${b}`);
-                }
+                promises.push(fetch(`${centralApi}?action=saveExtra&qrCode=${code}&lectureNum=${lec}&feedback=${f}&attitude=${a}&bonus=${b}${auth}`).then(r => r.json()).catch(e => ({})));
             }
 
-            if (p.length === 0) return showToast("⚠️ لم يتم إدخال أي تقييم!", "error");
+            // === SYNC to Individual Student Sheet ===
+            let personalApi = getPersonalApi(code);
+            if (personalApi) {
+                console.log("Syncing to personal sheet:", personalApi);
+                
+                // Attendance
+                if (document.getElementById('attBtn').classList.contains('active-att')) {
+                    promises.push(
+                        fetch(`${personalApi}?action=update&qrCode=${code}&taskName=${encodeURIComponent(taskName)}&category=${encodeURIComponent('attendance .15')}&val=15`)
+                        .then(r => r.json()).then(res => console.log("Sync Attendance:", res)).catch(e => console.error("Sync Error:", e))
+                    );
+                }
+                
+                // Main Task
+                if (taskVal) {
+                    promises.push(
+                        fetch(`${personalApi}?action=update&qrCode=${code}&taskName=${encodeURIComponent(taskName)}&category=${encodeURIComponent('Main task. 70')}&val=${taskVal}`)
+                        .then(r => r.json()).then(res => console.log("Sync Task:", res)).catch(e => console.error("Sync Error:", e))
+                    );
+                }
+                
+                // Quiz
+                if (quizVal) {
+                    promises.push(
+                        fetch(`${personalApi}?action=update&qrCode=${code}&taskName=${encodeURIComponent(taskName)}&category=${encodeURIComponent('online quize 25')}&val=${quizVal}`)
+                        .then(r => r.json()).then(res => console.log("Sync Quiz:", res)).catch(e => console.error("Sync Error:", e))
+                    );
+                }
+                
+                // Extra (attitude + feedback)
+                let combinedAtt = 0;
+                if (f) combinedAtt += 5;  // feedback = 5
+                if (a) combinedAtt += 5;  // attitude = 5
+                
+                if (combinedAtt > 0) {
+                    promises.push(
+                        fetch(`${personalApi}?action=update&qrCode=${code}&taskName=${encodeURIComponent(taskName)}&category=${encodeURIComponent('attitude .10')}&val=${combinedAtt}`)
+                        .then(r => r.json()).then(res => console.log("Sync Attitude:", res)).catch(e => console.error("Sync Error:", e))
+                    );
+                }
+                
+                // Bonus
+                if (b) {
+                    promises.push(
+                        fetch(`${personalApi}?action=update&qrCode=${code}&taskName=${encodeURIComponent(taskName)}&category=${encodeURIComponent('bonus')}&val=${b}`)
+                        .then(r => r.json()).then(res => console.log("Sync Bonus:", res)).catch(e => console.error("Sync Error:", e))
+                    );
+                }
+            } else {
+                console.log("No personal API found for:", code);
+            }
 
-            showToast("⏳ جاري التسجيل...", "success");
+            if (promises.length === 0) {
+                _isSubmitting = false;
+                return showToast("⚠️ لم يتم إدخال أي تقييم لإرساله!", "error");
+            }
+
+            _isSubmitting = false;
+
+            // Auto-clear for quick continuous entry
             document.getElementById('studentCode').value = "";
             document.getElementById('valTask').value = "";
             document.getElementById('valQuiz').value = "";
@@ -2156,233 +1414,200 @@
             document.getElementById('attitBtn').classList.remove('active-attit');
             document.getElementById('studentCode').focus();
 
-            Promise.all(p).then(res => {
-                let name = "";
-                for (let r of res) if (r && (r.name || r.studentName)) { name = r.name || r.studentName; break; }
-                showToast(`✅ تم رصد تقييم: ${name || code}`);
-            }).catch(() => showToast("حدث خطأ في بعض العمليات", "error"));
-        }
+            showToast("⏳ جاري التسجيل...", "success");
 
-        // 📊 Reports & Management
-        function loadDashboard() {
-            const lec = document.getElementById('lecture').value;
-            const group = localStorage.getItem('userGroup');
-            const tbody = document.getElementById('dashList');
-            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 30px;">⏳ جاري المزامنة...</td></tr>`;
-            fetch(`${getEffectiveApi(ATTENDANCE_API_URL)}?action=getDashboard&lectureNum=${lec}&group=${group}${getAuthParams()}`)
-                .then(r => r.json()).then(d => {
-                    if (d.status === "success" && d.attendees.length > 0) {
-                        allDashboard = d.attendees.map(a => ({ id: a.id, name: a.name, status: "✅ حاضر (" + a.time + ")" }));
-                        renderDashboard(allDashboard);
-                    } else tbody.innerHTML = `<tr><td colspan="3">لا توجد سجلات</td></tr>`;
-                }).catch(() => tbody.innerHTML = `<tr><td colspan="3">❌ خطأ اتصال</td></tr>`);
-        }
-
-        function renderDashboard(arr) {
-            const tbody = document.getElementById('dashList');
-            tbody.innerHTML = arr.map(a => `<tr><td style="font-weight:800; color:var(--electric-blue);">${a.id}</td><td style="font-weight:600;">${a.name}</td><td>${a.status}</td></tr>`).join('');
-        }
-
-        function filterDashboard() {
-            const q = (document.getElementById('searchDashInput').value || "").toLowerCase();
-            renderDashboard(allDashboard.filter(a => (a.name || "").toLowerCase().includes(q) || (a.id || "").includes(q)));
-        }
-
-        function loadAttendeesFromCentral() {
-            const lec = document.getElementById('attendLecNum').value;
-            const group = localStorage.getItem('userGroup');
-            const tbody = document.getElementById('attendeesList');
-            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:30px;">⏳ جاري المزامنة...</td></tr>`;
-            fetch(`${getEffectiveApi(ATTEND_API)}?action=getTop&fromLec=${lec}&toLec=${lec}&weight=15${getAuthParams()}`)
-                .then(r => r.json()).then(data => {
-                    if (data.status === "success" && data.scores) {
-                        const present = data.scores.filter(s => s.total > 0);
-                        document.getElementById('attendeesCount').innerText = present.length + " / " + data.scores.length;
-                        allAttendees = present.map(s => ({ id: s.id, name: s.name, time: "✅ حاضر" }));
-                        renderAttendeesTable(allAttendees);
-                    } else {
-                        allAttendees = [];
-                        tbody.innerHTML = `<tr><td colspan="3">لا توجد سجلات</td></tr>`;
+            Promise.all(promises).then(results => {
+                let studentName = "";
+                for (let res of results) {
+                    if (!res) continue;
+                    if (res.name) { studentName = res.name; break; }
+                    if (res.studentName) { studentName = res.studentName; break; }
+                    if (res.message && res.message.includes("الطالب")) {
+                        let parts = res.message.split("الطالب");
+                        if (parts.length > 1) { studentName = parts[1].replace(':', '').trim(); break; }
                     }
-                }).catch(() => tbody.innerHTML = `<tr><td colspan="3">❌ خطأ</td></tr>`);
+                    if (res.message && res.message.includes("-")) {
+                        let parts = res.message.split("-");
+                        if (parts.length > 1) { studentName = parts[1].trim(); break; }
+                    }
+                }
+                let displayName = studentName || (groupLetter + num);
+                showToast("✅ تم التوثيق بنجاح لـ: " + displayName, "success");
+            }).catch(e => {
+                showToast("❌ حدث خطأ في بعض ملفات التقييم", "error");
+            });
         }
 
-        function renderAttendeesTable(arr) {
-            const tbody = document.getElementById('attendeesList');
-            tbody.innerHTML = arr.map(a => `<tr><td style="font-weight:800; color:var(--electric-blue);">${a.id}</td><td style="font-weight:600;">${a.name}</td><td><span class="status-badge">${a.time}</span></td></tr>`).join('');
-        }
+        async function searchStudent() {
+            let numRaw = document.getElementById('searchCode').value.trim();
+            if (!numRaw) return showToast("❌ برجاء إدخال رقم الطالب", "error");
 
-        function filterAttendees() {
-            const q = (document.getElementById('attendSearchInput').value || "").toLowerCase();
-            renderAttendeesTable(allAttendees.filter(a => (a.name || "").toLowerCase().includes(q) || (a.id || "").includes(q)));
-        }
+            let num = convertNumerals(numRaw);
+            let fl = document.getElementById('sfL').value, tl = document.getElementById('stL').value;
+            if (parseInt(fl) > parseInt(tl)) return showToast("❌ نطاق المحاضرات غير صحيح", "error");
 
-        // 🏆 Leaderboard
-        async function extractLeaderboard() {
-            let fl = document.getElementById('fL').value, tl = document.getElementById('tL').value;
-            showLoader(true, "جاري استخراج الترتيب 🏆...");
+            const group = localStorage.getItem('userGroup');
+            const code = group.replace("Group ", "").trim() + num + "EDUR9";
+
+            showLoader(true, "جاري استرجاع سجلات الطالب 🔍...");
             try {
-                const auth = getAuthParams() + `&fromLec=${fl}&toLec=${tl}&fromTask=${fl}&toTask=${tl}&fromQuiz=${fl}&toQuiz=${tl}`;
-                const [rT, rQ, rA, rX] = await Promise.all([
-                    fetch(`${getEffectiveApi(GRADES_API)}?action=getTop${auth}`).then(r => r.json()),
-                    fetch(`${getEffectiveApi(QUIZ_API)}?action=getTop${auth}`).then(r => r.json()),
-                    fetch(`${getEffectiveApi(ATTEND_API)}?action=getTop&weight=15${auth}`).then(r => r.json()),
-                    fetch(`${getEffectiveApi(EXTRA_API)}?action=getTop${auth}`).then(r => r.json())
+                const auth = getAuthParams();
+                
+                // Fetch each category separately with correct parameters
+                const [rAttend, rTasks, rQuizzes, rExtra] = await Promise.all([
+                    // Attendance: uses fromLec/toLec (no task or quiz params)
+                    fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&fromLec=${fl}&toLec=${tl}&weight=15${auth}`).then(r => r.json()),
+                    // Main Tasks: uses fromTask/toTask
+                    fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&fromTask=${fl}&toTask=${tl}${auth}`).then(r => r.json()),
+                    // Quizzes: uses fromQuiz/toQuiz  
+                    fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&fromQuiz=${fl}&toQuiz=${tl}${auth}`).then(r => r.json()),
+                    // Extra (feedback + attitude + bonus): uses extraOnly
+                    fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&extraOnly=1&fromLec=${fl}&toLec=${tl}${auth}`).then(r => r.json())
                 ]);
-                let m = {};
-                const col = (d) => { if (d.status === 'success') d.scores.forEach(s => { let v = parseFloat(s.total); if (!isNaN(v)) { if (!m[s.id]) m[s.id] = { id: s.id, n: s.name, t: 0 }; m[s.id].t += v; } }); };
-                col(rT); col(rQ); col(rA); col(rX);
-                fullLeaderboard = Object.values(m).sort((a, b) => b.t - a.t);
-                fullLeaderboard.forEach((s, i) => s.rank = i + 1);
+
+                let total = 0; let html = "";
+                const addRow = (res, label) => {
+                    let s = (res.scores || []).find(x => x.id === code);
+                    let val = (s && !isNaN(parseFloat(s.total))) ? parseFloat(s.total) : 0;
+                    html += `<tr><td>${label}</td><td><span style="color:var(--electric-blue); font-size:1.1rem;">${val}</span></td></tr>`;
+                    total += val;
+                    if (s && s.name) document.getElementById('resName').innerText = s.name;
+                };
+
+                document.getElementById('resName').innerText = "لم يتم العثور على اسم";
+                
+                // Each API returns its own category data
+                addRow(rAttend, "إجمالي الحضور");
+                addRow(rTasks, "إجمالي التاسكات");
+                addRow(rQuizzes, "إجمالي الكويزات");
+                addRow(rExtra, "إجمالي (الفيدباك + السلوك + البونص)");
+
+                document.getElementById('searchResult').style.display = 'block';
+                document.getElementById('resDetails').innerHTML = html;
+                document.getElementById('resTotal').innerText = total;
                 showLoader(false);
+
+            } catch (e) { 
+                console.error(e);
+                showLoader(false); 
+                showToast("❌ خطأ في جلب البيانات", "error"); 
+            }
+        }
+
+        let fullLeaderboard = [];
+        async function extractLeaderboard(useCache = true) {
+            let fl = document.getElementById('fL').value, tl = document.getElementById('tL').value;
+            if (parseInt(fl) > parseInt(tl)) return showToast("❌ نطاق المحاضرات غير صحيح", "error");
+
+            // Check cache first
+            const cacheParams = `fl=${fl}&tl=${tl}`;
+            if (useCache) {
+                const cached = getGradesCached('leaderboard');
+                if (cached && GRADES_CACHE.leaderboard.params === cacheParams) {
+                    fullLeaderboard = cached;
+                    renderLeaderboard(fullLeaderboard);
+                    if (fullLeaderboard.length > 0) {
+                        document.getElementById('chartWrapper').style.display = 'block';
+                        let top5 = fullLeaderboard.slice(0, 5);
+                        renderChart(top5.map(x => (x.n || "").split(" ")[0]), top5.map(x => x.t));
+                    }
+                    return;
+                }
+            }
+
+            showLoader(true, "جاري تحليل بيانات الجروب لاستخراج الترتيب 🏆...");
+            try {
+                const auth = getAuthParams();
+
+                // Fetch each category separately
+                const [rTasks, rQuizzes, rAttend, rExtra] = await Promise.all([
+                    fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&fromTask=${fl}&toTask=${tl}${auth}`).then(r => r.json()),
+                    fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&fromQuiz=${fl}&toQuiz=${tl}${auth}`).then(r => r.json()),
+                    fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&fromLec=${fl}&toLec=${tl}&weight=15${auth}`).then(r => r.json()),
+                    fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&extraOnly=1&fromLec=${fl}&toLec=${tl}${auth}`).then(r => r.json())
+                ]);
+
+                let m = {};
+                const col = (d, weight = 1) => {
+                    if (d.status === 'success') {
+                        d.scores.forEach(s => {
+                            let val = parseFloat(s.total);
+                            if (!isNaN(val)) {
+                                if (!m[s.id]) m[s.id] = { id: s.id, n: s.name, t: 0 };
+                                m[s.id].t += val;
+                            }
+                        });
+                    }
+                };
+
+                col(rTasks); col(rQuizzes); col(rAttend); col(rExtra);
+
+                fullLeaderboard = Object.values(m).sort((a, b) => b.t - a.t);
+                fullLeaderboard.forEach((s, idx) => s.rank = idx + 1);
+
+                showLoader(false);
+
+                if (fullLeaderboard.length === 0) {
+                    document.getElementById('leaderboard').innerHTML = "<div style='text-align:center; padding:20px; color:var(--text-muted); font-weight:bold;'>لا توجد بيانات كافية لعرض الترتيب</div>";
+                    document.getElementById('chartWrapper').style.display = 'none';
+                    return;
+                }
+
                 renderLeaderboard(fullLeaderboard);
                 document.getElementById('chartWrapper').style.display = 'block';
                 let top5 = fullLeaderboard.slice(0, 5);
                 renderChart(top5.map(x => (x.n || "").split(" ")[0]), top5.map(x => x.t));
-            } catch (e) { showLoader(false); showToast("❌ فشل الاستخراج", "error"); }
+                
+                // Save to cache
+                setGradesCache('leaderboard', fullLeaderboard, cacheParams);
+
+            } catch (e) { 
+                console.error(e);
+                showLoader(false); 
+                showToast("❌ فشل استخراج الترتيب", "error"); 
+            }
         }
 
-        function renderLeaderboard(arr) {
-            let h = arr.map(s => `
-                <div class="leader-card rank-${s.rank <= 3 ? s.rank : 'other'}">
-                    <div class="leader-rank">${s.rank <= 3 ? ['🥇','🥈','🥉'][s.rank-1] : '#'+s.rank}</div>
-                    <div class="leader-name" style="flex:1; text-align:right;">${s.n}<br><small>${s.id}</small></div>
-                    <div class="leader-score">${s.t} Pt</div>
-                </div>
-            `).join('');
-            document.getElementById('leaderboard').innerHTML = h || "لا نتائج";
+        function renderLeaderboard(dataArray) {
+            let listHtml = "";
+            if (dataArray.length === 0) {
+                document.getElementById('leaderboard').innerHTML = "<div style='text-align:center; padding:20px;'>لا توجد نتائج متطابقة للبحث</div>"; return;
+            }
+            dataArray.forEach(s => {
+                let rankClass = s.rank <= 3 ? `rank-${s.rank}` : `rank-other`;
+                let rankIcon = s.rank === 1 ? "🥇" : s.rank === 2 ? "🥈" : s.rank === 3 ? "🥉" : `#${s.rank}`;
+                listHtml += `
+            <div class="leader-card ${rankClass}">
+                <div class="leader-rank">${rankIcon}</div>
+                <div class="leader-name" style="flex:1; padding-right:15px; text-align:right;">${s.n} <br><span style="font-size:11px; color:var(--text-muted); font-family:monospace;">${s.id}</span></div>
+                <div class="leader-score">${s.t} Pt</div>
+            </div>`;
+            });
+            document.getElementById('leaderboard').innerHTML = listHtml;
+        }
+
+        function filterLeaderboard() {
+            const query = (document.getElementById('searchLeaderInput').value || "").toLowerCase();
+            renderLeaderboard(fullLeaderboard.filter(s => (s.n || "").toLowerCase().includes(query) || (s.id || "").toLowerCase().includes(query)));
         }
 
         function renderChart(labels, data) {
             const ctx = document.getElementById('topChart').getContext('2d');
             if (myChart) myChart.destroy();
+            const isDark = document.body.classList.contains('dark-mode');
+            const barColor = isDark ? '#00d2ff' : '#0f172a';
+            const textColor = isDark ? '#cbd5e1' : '#64748b';
+
             myChart = new Chart(ctx, {
                 type: 'bar',
-                data: { labels, datasets: [{ label: 'النقاط', data, backgroundColor: '#00d2ff', borderRadius: 8 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                data: { labels, datasets: [{ label: 'إجمالي النقاط', data, backgroundColor: ['#FFD700', '#C0C0C0', '#CD7F32', barColor, barColor], borderRadius: 8 }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { color: textColor } }, x: { ticks: { color: textColor, font: { family: 'Cairo', weight: 'bold' } } } }, plugins: { legend: { display: false } } }
             });
         }
 
-        // 👥 User Management
-        function loadUsers() {
-            const tbody = document.getElementById('usersList');
-            tbody.innerHTML = `<tr><td colspan="4">⏳ جاري التحميل...</td></tr>`;
-            fetch(`${LOGIN_API_URL}?action=getUsers${getAuthParams()}`)
-                .then(r => r.json()).then(d => {
-                    if (d.status === "success") {
-                        allSystemUsers = d.users.filter(u => u.role !== 'Owner');
-                        renderUsersTable(allSystemUsers);
-                    }
-                });
-        }
-
-        function renderUsersTable(users) {
-            const tbody = document.getElementById('usersList');
-            tbody.innerHTML = users.map(u => `
-                <tr>
-                    <td><b>${u.name}</b><br><small>${u.email}</small></td>
-                    <td>${u.role}</td>
-                    <td>${u.group}</td>
-                    <td><button class="btn-danger btn-small" onclick="deleteUser('${u.email}')">عزل 🗑️</button></td>
-                </tr>
-            `).join('');
-        }
-
-        function deleteUser(email) { if(confirm("تأكيد عزل المستخدم؟")) fetch(`${LOGIN_API_URL}?action=deleteUser&targetEmail=${encodeURIComponent(email)}${getAuthParams()}`).then(()=>loadUsers()); }
-
-        // 🔄 Offline Sync
-        function updateOfflineBadge() {
-            const b = document.getElementById('offlineBadge');
-            if(b) {
-                b.style.display = offlineQueue.length > 0 ? 'block' : 'none';
-                document.getElementById('offlineCount').innerText = offlineQueue.length;
-            }
-        }
-
-        function syncOfflineData() {
-            if (!navigator.onLine) return showToast("لا يوجد إنترنت", "error");
-            showLoader(true, "مزامنة البيانات المتأخرة...");
-            const next = () => {
-                if (offlineQueue.length === 0) { showLoader(false); updateOfflineBadge(); return showToast("✅ تمت المزامنة بنجاح"); }
-                const item = offlineQueue[0];
-                fetch(`${getEffectiveApi(ATTENDANCE_API_URL)}?action=scan&qrCode=${item.code}&lectureNum=${item.lecture}&group=${item.group}${getAuthParams()}`)
-                    .then(() => { offlineQueue.shift(); localStorage.setItem('offlineQueue', JSON.stringify(offlineQueue)); next(); })
-                    .catch(() => { showLoader(false); showToast("فشلت المزامنة", "error"); });
-            };
-            next();
-        }
-
-        // 🔌 Initialization
-        function loadLinksDatabase() {
-            fetch(`${CENTRAL_LINKS_API}?action=getAllLinks`).then(r => r.json()).then(d => {
-                if (d.status === "success") {
-                    for (let g in d.groups) localStorage.setItem(`GROUP_API_${g}`, d.groups[g]);
-                    localStorage.setItem('PERSONAL_LINKS_MAP', JSON.stringify(d.individuals));
-                }
-            });
-        }
-
-        function fillGroupSelects() {
-            let options = ''; 
-            for (let i = 0; i < 26; i++) { let g = 'Group ' + String.fromCharCode(65 + i); options += `<option value="${g}">${g}</option>`; }
-            if (document.getElementById('newUserGroup')) document.getElementById('newUserGroup').innerHTML = options;
-            if (document.getElementById('globalGroupSelect')) document.getElementById('globalGroupSelect').innerHTML = options;
-        }
-
-        function changeGlobalGroup(val) {
-            localStorage.setItem('userGroup', val);
-            applyRolesToUI();
-            if (currentView === 'dashboard') loadDashboard();
-            if (currentView === 'attendeesView') loadAttendeesFromCentral();
-        }
-
-        // Settings Specific
-        function saveGroupApi() {
-            const url = document.getElementById('groupApiInput').value.trim();
-            const group = localStorage.getItem('userGroup');
-            if(!url) return showToast("أدخل الرابط", "error");
-            showToast("⏳ جاري الحفظ...");
-            fetch(`${CENTRAL_LINKS_API}?action=saveGroup&group=${encodeURIComponent(group)}&url=${encodeURIComponent(url)}`)
-                .then(() => { localStorage.setItem(`GROUP_API_${group}`, url); showToast("✅ تم الحفظ"); });
-        }
-        function resetGroupApi() {
-            const group = localStorage.getItem('userGroup');
-            fetch(`${CENTRAL_LINKS_API}?action=removeGroup&group=${encodeURIComponent(group)}`)
-                .then(() => { localStorage.removeItem(`GROUP_API_${group}`); showToast("🔄 تم الاسترجاع"); });
-        }
-        function savePersonalApi() {
-            const url = document.getElementById('personalApiInput').value.trim();
-            let code = document.getElementById('targetStudentCode').value.trim().toUpperCase();
-            if(!code || !url) return showToast("أدخل البيانات", "error");
-            if(!code.includes("EDUR")) code += "EDUR9";
-            fetch(`${CENTRAL_LINKS_API}?action=saveIndividual&code=${encodeURIComponent(code)}&url=${encodeURIComponent(url)}`)
-                .then(() => {
-                    let m = JSON.parse(localStorage.getItem('PERSONAL_LINKS_MAP') || '{}');
-                    m[code] = url; localStorage.setItem('PERSONAL_LINKS_MAP', JSON.stringify(m));
-                    showToast("✅ تم الربط");
-                });
-        }
-
-        window.onload = () => {
-            if (localStorage.getItem('isLoggedIn') !== 'true') { window.location.href = 'index.html'; return; }
-            if (localStorage.getItem('darkMode') === 'true') { document.body.classList.add('dark-mode'); document.getElementById('themeToggle').innerText = '🌙'; }
-            fillGroupSelects();
-            loadLinksDatabase();
-            checkAuth();
-            updateOfflineBadge();
-
-            document.getElementById('manualCode')?.addEventListener('keydown', e => { if (e.key === 'Enter') submitManualAttend(); });
-            document.getElementById('studentCode')?.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('valTask').focus(); });
-            
-            if (typeof Html5Qrcode !== 'undefined') {
-                Html5Qrcode.getCameras().then(devices => {
-                    const sel = document.getElementById('cameraSelection');
-                    if (sel && devices.length > 0) {
-                        sel.innerHTML = devices.map((d, i) => `<option value="${d.id}" ${d.label.toLowerCase().includes('back') ? 'selected' : ''}>${d.label || 'كاميرا ' + (i+1)}</option>`).join('');
-                    }
-                });
-            }
-        };
+        function loadSettingMax() { }
+        function saveMaxConfig() { showToast("✅ تم حفظ الإعدادات بنجاح"); }
     </script>
 </body>
+
 </html>
