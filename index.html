@@ -1868,7 +1868,7 @@
   <script>
     const CENTRAL_LINKS_API = "https://script.google.com/macros/s/AKfycbxFT_0yMGQMp2tK_F3G_ndN-b5URC-PQOxaT63rLPExzCNyV6p9-UKGpKELVnJbc2LA/exec";
 
-    let ATTENDANCE_API_URL = "https://script.google.com/macros/s/AKfycbyJEb3_K7ORGnidD1GT6AjDS3kGgHjBMMAZ7iKT7tkI4JKR7pfRknMl-UumqqWW_5Hk3Q/exec";
+    let ATTENDANCE_API_URL = "https://script.google.com/macros/s/AKfycbx715VQ1MfNK_yLaX6m2rrNaGrJANjIGss9ysM4Sv8z6npcjVJOdnGZZDbJL74-oxDu/exec";
     let LOGIN_API_URL = "https://script.google.com/macros/s/AKfycbw-oytOWrgERm2yXu-NagMlyS14HlUGeAlsWqrZl2SwRJIi0IDL1AH2VduQvsmIIkNgFA/exec";
 
     // 🔗 دالة اختيار الـ API المناسب المخصص للجروب
@@ -1882,13 +1882,51 @@
     let currentView = localStorage.getItem('savedView') || 'login';
     let attendanceChartInstance = null;
     let lastSyncTime = 0; const SYNC_COOLDOWN = 60000;
+    let _isScanning = false;
+    
+    // Smart caching system
+    const CACHE = {
+      dashboard: { data: null, timestamp: 0 },
+      analytics: { data: null, timestamp: 0 }
+    };
+    const CACHE_TTL = 30000; // 30 seconds cache
+    
+    function getCachedData(key) {
+      const cache = CACHE[key];
+      if (cache && cache.data && (Date.now() - cache.timestamp < CACHE_TTL)) {
+        return cache.data;
+      }
+      return null;
+    }
+    
+    function setCachedData(key, data) {
+      CACHE[key] = { data, timestamp: Date.now() };
+    }
+    
+    function clearCache(key) {
+      if (key) {
+        CACHE[key] = { data: null, timestamp: 0 };
+      } else {
+        CACHE.dashboard = { data: null, timestamp: 0 };
+        CACHE.analytics = { data: null, timestamp: 0 };
+      }
+    }
 
     let offlineQueue = JSON.parse(localStorage.getItem('offlineQueue')) || [];
-
+    const MAX_OFFLINE_RECORDS = 100;
+    const OFFLINE_STORAGE_KEY = 'offlineQueue';
+    const LAST_OFFLINE_SYNC = 'lastOfflineSync';
+    
     function convertNumerals(str) {
       if (!str) return "";
       const arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
       return str.toString().replace(/[٠-٩]/g, w => arabicNumbers.indexOf(w));
+    }
+
+    function convertNumeralsToEnglish(str) {
+      if (!str) return "";
+      const arabicToEnglish = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
+      return str.replace(/[٠-٩]/g, w => arabicToEnglish[w]);
     }
 
     let loaderInterval;
@@ -1914,11 +1952,65 @@
     }
 
     function playBeep(type) {
-      if (navigator.vibrate) { if (type === 'success') navigator.vibrate(150); else navigator.vibrate([100, 50, 100, 50, 200]); }
-      const ctx = new (window.AudioContext || window.webkitAudioContext)(); const osc = ctx.createOscillator(); const gain = ctx.createGain();
-      osc.connect(gain); gain.connect(ctx.destination);
-      if (type === 'success') { osc.type = 'sine'; osc.frequency.value = 800; gain.gain.value = 0.1; osc.start(); osc.stop(ctx.currentTime + 0.15); }
-      else { osc.type = 'sawtooth'; osc.frequency.value = 300; gain.gain.value = 0.1; osc.start(); osc.stop(ctx.currentTime + 0.3); }
+      if (navigator.vibrate) { 
+        if (type === 'success') navigator.vibrate([100, 50, 100]); 
+        else navigator.vibrate([200, 100, 200, 100, 300]); 
+      }
+      
+      // Use Web Audio API for better sound
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      
+      if (type === 'success') {
+        // Pleasant success chime - ascending tone
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.25);
+      } else if (type === 'error') {
+        // Error tone - descending
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(400, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.35);
+      } else if (type === 'warning') {
+        // Warning - pulsing
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(600, ctx.currentTime);
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.15);
+      }
+    }
+
+    // Full audio notification with name
+    function playSuccessWithName(studentName) {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      
+      // Success chime
+      [880, 1100, 1320].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.12, ctx.currentTime + i * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.08 + 0.15);
+        osc.start(ctx.currentTime + i * 0.08);
+        osc.stop(ctx.currentTime + i * 0.08 + 0.15);
+      });
+      
+      if (navigator.vibrate) navigator.vibrate([50, 30, 50, 30, 100]);
     }
 
     function getAuthParams() {
@@ -1950,30 +2042,72 @@
     }
 
     function syncOfflineData() {
-      if (!navigator.onLine) return alert("الإنترنت ما زال مقطوعاً. تأكد من الاتصال أولاً.");
-      if (offlineQueue.length === 0) return;
-
-      showProgress("جاري رفع البيانات المتأخرة للسيرفر...");
-      let successCount = 0;
-      function uploadNext(index) {
-        if (index >= offlineQueue.length) {
-          offlineQueue = []; localStorage.setItem('offlineQueue', JSON.stringify(offlineQueue)); updateOfflineBadge(); completeProgress(); showToast(`✅ تمت مزامنة ${successCount} سجلات بنجاح!`, "success"); return;
-        }
-        let record = offlineQueue[index];
-        fetch(`${getEffectiveApi(ATTENDANCE_API_URL)}?action=scan&qrCode=${encodeURIComponent(record.code)}&lectureNum=${encodeURIComponent(record.lecture)}&group=${encodeURIComponent(record.group)}${getAuthParams()}`)
-          .then(res => res.json()).then(data => {
-            if (data.status === "success" || data.status === "already") successCount++; uploadNext(index + 1);
-          }).catch(err => {
-            offlineQueue = offlineQueue.slice(index); localStorage.setItem('offlineQueue', JSON.stringify(offlineQueue)); updateOfflineBadge(); completeProgress(); showToast("❌ انقطع الاتصال أثناء المزامنة. حاول مجدداً.", "error");
-          });
+      if (!navigator.onLine) {
+        showToast("⚠️ لا يوجد اتصال بالإنترنت", "warning");
+        return;
       }
-      uploadNext(0);
+      if (offlineQueue.length === 0) return showToast("ℹ️ لا توجد بيانات离线ية", "warning");
+
+      showProgress("جاري مزامنة البيانات...");
+      let successCount = 0;
+      let failedRecords = [];
+      
+      // Batch upload with better error handling
+      const uploadBatch = async () => {
+        for (let i = 0; i < offlineQueue.length; i++) {
+          let record = offlineQueue[i];
+          try {
+            const response = await fetch(`${getEffectiveApi(ATTENDANCE_API_URL)}?action=scan&qrCode=${encodeURIComponent(record.code)}&lectureNum=${encodeURIComponent(record.lecture)}&group=${encodeURIComponent(record.group)}${getAuthParams()}`);
+            const data = await response.json();
+            
+            if (data.status === "success" || data.status === "already") {
+              successCount++;
+            } else {
+              failedRecords.push(record);
+            }
+          } catch (err) {
+            failedRecords.push(record);
+          }
+        }
+        
+        // Update queue with only failed records
+        offlineQueue = failedRecords;
+        localStorage.setItem(OFFLINE_STORAGE_KEY, JSON.stringify(offlineQueue));
+        localStorage.setItem(LAST_OFFLINE_SYNC, new Date().toISOString());
+        
+        updateOfflineBadge();
+        completeProgress();
+        
+        if (successCount > 0) {
+          showToast(`✅ تم مزامنة ${successCount} / ${offlineQueue.length + successCount} سجل`, "success");
+          playSuccessWithName(successCount + ' records synced');
+        } else {
+          showToast("❌ فشل في المزامنة", "error");
+          playBeep('error');
+        }
+      };
+      
+      uploadBatch();
+    }
+    
+    // Auto-sync when back online
+    function setupAutoSync() {
+      window.addEventListener('online', () => {
+        if (offlineQueue.length > 0) {
+          showToast("🔄 جاري المزامنة التلقائية...", "info");
+          setTimeout(syncOfflineData, 2000);
+        }
+      });
     }
 
     window.onload = function () {
       try {
         if (localStorage.getItem('darkMode') === 'true') { document.body.classList.add('dark-mode'); document.getElementById('themeToggle').innerText = '🌙'; }
-        updateOfflineBadge(); window.addEventListener('online', updateOfflineBadge); window.addEventListener('offline', updateOfflineBadge);
+        updateOfflineBadge(); 
+        
+        // Setup auto-sync when network returns
+        setupAutoSync();
+        window.addEventListener('online', updateOfflineBadge);
 
         fillGroupSelects();
 
@@ -2184,7 +2318,12 @@
       localStorage.setItem('userGroup', newGroup);
       const gBadge = document.getElementById('groupBadge');
       if (gBadge) gBadge.innerText = newGroup;
-      if (currentView === 'dashboard') loadDashboard(); if (currentView === 'analytics') fetchAnalyticsData();
+      
+      // Clear cache when changing group to get fresh data
+      clearCache('dashboard');
+      
+      if (currentView === 'dashboard') loadDashboard(false); // Force refresh
+      if (currentView === 'analytics') fetchAnalyticsData();
     }
 
     function startLiveCamera() {
@@ -2225,8 +2364,11 @@
       document.getElementById('manualCode').value = "";
     }
 
-    function sendDataToAPI(studentCode) {
+   function sendDataToAPI(studentCode) {
       if (!studentCode) return;
+      if (_isScanning) return; // Prevent double submit
+      _isScanning = true;
+      
       studentCode = studentCode.toUpperCase();
       if (!studentCode.endsWith("EDUR9")) { studentCode = studentCode + "EDUR9"; }
 
@@ -2241,12 +2383,29 @@
 
       const lec = document.getElementById('lecture').value; const group = localStorage.getItem('userGroup') || "Group A";
 
-      if (!navigator.onLine) {
+      // Check online status
+      const isOnline = navigator.onLine && window.navigator.onLine;
+      
+      if (!isOnline) {
+        // Add to offline queue with limit
+        if (offlineQueue.length >= MAX_OFFLINE_RECORDS) {
+          offlineQueue.shift(); // Remove oldest
+        }
         offlineQueue.push({ code: studentCode, lecture: lec, group: group, time: new Date().toISOString() });
-        localStorage.setItem('offlineQueue', JSON.stringify(offlineQueue));
-        updateOfflineBadge(); showToast("⚠️ تم الحفظ محلياً لعدم توفر إنترنت", "warning"); playBeep('success'); return;
+        try {
+          localStorage.setItem(OFFLINE_STORAGE_KEY, JSON.stringify(offlineQueue));
+        } catch(e) {
+          // Storage full - try to save smaller
+          offlineQueue = offlineQueue.slice(-50);
+          localStorage.setItem(OFFLINE_STORAGE_KEY, JSON.stringify(offlineQueue));
+        }
+        updateOfflineBadge(); 
+        showToast("⚠️ تم الحفظ offline - " + offlineQueue.length + " سجل", "warning"); 
+        playBeep('warning');
+        return;
       }
 
+      // 1️⃣ إرسال الحضور إلى الشيت المركزي (Diploma Sheets)
       fetch(`${getEffectiveApi(ATTENDANCE_API_URL)}?action=scan&qrCode=${encodeURIComponent(studentCode)}&lectureNum=${encodeURIComponent(lec)}&group=${encodeURIComponent(group)}${getAuthParams()}`)
         .then(res => res.json()).then(data => {
           if (data.status === "success") {
@@ -2255,7 +2414,8 @@
             let successMsg = studentName
               ? `✅ تم تسجيل حضور ${studentName} (${studentCode}) — ${timeNow}`
               : `✅ تم تسجيل الحضور (${studentCode}) — ${timeNow}`;
-            showToast(successMsg, "success"); playBeep('success');
+            showToast(successMsg, "success"); 
+            playSuccessWithName(studentName);
           }
           else { showToast(data.message, "error"); playBeep('error'); }
         }).catch(err => {
@@ -2263,18 +2423,80 @@
           localStorage.setItem('offlineQueue', JSON.stringify(offlineQueue));
           updateOfflineBadge(); showToast("⚠️ تم الحفظ محلياً لضعف الشبكة.", "warning"); playBeep('success');
         });
-    }
 
-    function loadDashboard() {
-      const lec = document.getElementById('lecture').value; const group = localStorage.getItem('userGroup') || "Group A";
-      const tbody = document.getElementById('attendeesList'); tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 30px;">⏳ المزامنة...</td></tr>`;
+      // 2️⃣ إرسال 15 درجة حضور إلى شيت الطالب الفردي في نفس اللحظة ⚡
+      let linksMap = JSON.parse(localStorage.getItem('PERSONAL_LINKS_MAP') || '{}');
+      let personalApi = linksMap[studentCode]; 
+      
+      if (personalApi) {
+          let taskName = "TASK " + lec; // تحويل رقم المحاضرة لاسم التاسك
+          console.log("Syncing attendance to personal sheet:", personalApi);
+          
+          // نستخدم نفس طريقة رصد الدرجات لضمان توافقها 100% مع شيت الطالب
+          fetch(`${personalApi}?action=update&qrCode=${encodeURIComponent(studentCode)}&taskName=${encodeURIComponent(taskName)}&category=${encodeURIComponent('attendance .15')}&val=15`)
+            .then(r => r.json())
+            .then(res => console.log("Personal Sheet Synced:", res))
+            .catch(e => console.error("Personal Sheet Sync Error:", e));
+      } else {
+          console.log("No personal API linked for student:", studentCode);
+      }
+      
+      setTimeout(() => { _isScanning = false; }, 1500); // Debounce
+    }
+    function loadDashboard(useCache = true) {
+      const lec = document.getElementById('lecture').value; 
+      const group = localStorage.getItem('userGroup') || "Group A";
+      const tbody = document.getElementById('attendeesList');
+      
+      // Use cache if valid
+      if (useCache) {
+        const cached = getCachedData('dashboard');
+        if (cached && cached.lec === lec && cached.group === group) {
+          completeProgress();
+          document.getElementById('dashCount').innerText = cached.count || 0;
+          if (cached.attendees && cached.attendees.length > 0) {
+            allAttendees = cached.attendees.map((d, i) => ({ ...d, _originalIdx: i }));
+            renderTable(allAttendees);
+          } else {
+            allAttendees = [];
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 30px; color:var(--text-muted);">لا توجد سجلات حالياً</td></tr>`;
+          }
+          return;
+        }
+      }
+      
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 30px;">⏳ المزامنة...</td></tr>`;
       showProgress("سحب بيانات الحضور...");
+      
       fetch(`${getEffectiveApi(ATTENDANCE_API_URL)}?action=getDashboard&lectureNum=${encodeURIComponent(lec)}&group=${encodeURIComponent(group)}${getAuthParams()}`)
         .then(res => res.json()).then(data => {
-          completeProgress(); document.getElementById('dashCount').innerText = data.count || 0;
-          if (data.status === "success" && data.attendees.length > 0) { allAttendees = data.attendees.map((d, i) => ({ ...d, _originalIdx: i })); renderTable(allAttendees); }
-          else { allAttendees = []; tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 30px; color:var(--text-muted);">لا توجد سجلات حالياً</td></tr>`; }
-        }).catch(err => { completeProgress(); tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#ef4444; padding: 30px;">❌ خطأ</td></tr>`; });
+          completeProgress(); 
+          document.getElementById('dashCount').innerText = data.count || 0;
+          
+          // Cache the results
+          setCachedData('dashboard', { lec, group, count: data.count, attendees: data.attendees });
+          
+          if (data.status === "success" && data.attendees.length > 0) { 
+            allAttendees = data.attendees.map((d, i) => ({ ...d, _originalIdx: i })); 
+            renderTable(allAttendees); 
+          }
+          else { 
+            allAttendees = []; 
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 30px; color:var(--text-muted);">لا توجد سجلات حالياً</td></tr>`; 
+          }
+        }).catch(err => { 
+          completeProgress(); 
+          // Try to use stale cache on error
+          const cached = getCachedData('dashboard');
+          if (cached) {
+            allAttendees = cached.attendees.map((d, i) => ({ ...d, _originalIdx: i }));
+            renderTable(allAttendees);
+            document.getElementById('dashCount').innerText = cached.count || 0;
+            showToast("⚠️ استخدام بيانات مخزنة (غير متصلة)", "warning");
+          } else {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#ef4444; padding: 30px;">❌ خطأ في الاتصال</td></tr>`;
+          }
+        });
     }
 
     function renderTable(dataArray) {
@@ -2341,7 +2563,7 @@
 
       const lec = document.getElementById('lecture').value; const group = localStorage.getItem('userGroup') || "Group A";
 
-      fetch(`${ATTENDANCE_API_URL}?action=deleteAttendance&qrCode=${encodeURIComponent(studentCode)}&lectureNum=${encodeURIComponent(lec)}&group=${encodeURIComponent(group)}${getAuthParams()}`)
+      fetch(`${getEffectiveApi(ATTENDANCE_API_URL)}?action=deleteAttendance&qrCode=${encodeURIComponent(studentCode)}&lectureNum=${encodeURIComponent(lec)}&group=${encodeURIComponent(group)}${getAuthParams()}`)
         .then(res => res.json()).then(data => {
           if (data.status === 'success') {
             showToast("✅ تمت إزالة السجل نهائياً", "success");
