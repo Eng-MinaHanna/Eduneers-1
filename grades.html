@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title> Eduneers | Grades System </title>
     <link rel="manifest" href="manifest.json">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/chart.js" as="script">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
@@ -1042,6 +1044,43 @@
       search: { data: null, timestamp: 0, code: '' }
     };
     const GRADES_CACHE_TTL = 20000; // 20 seconds
+    
+    // Prefetch system for grades - loads data in background
+    const GRADES_PREFETCH = {
+      enabled: true,
+      idleTime: 4000,
+      timeout: null,
+      
+      start: function() {
+        if (!this.enabled || this.timeout) return;
+        this.timeout = setTimeout(() => this.prefetchData(), this.idleTime);
+      },
+      
+      cancel: function() {
+        if (this.timeout) {
+          clearTimeout(this.timeout);
+          this.timeout = null;
+        }
+      },
+      
+      prefetchData: function() {
+        this.enabled = false;
+        
+        const auth = getAuthParams();
+        const group = localStorage.getItem('userGroup') || "Group A";
+        
+        // Fire and forget prefetch for common ranges
+        fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&fromTask=1&toTask=5${auth}`, { method: 'HEAD' })
+          .catch(() => {});
+        fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&fromLec=1&toLec=5${auth}`, { method: 'HEAD' })
+          .catch(() => {});
+      }
+    };
+    
+    // Track activity to trigger prefetch
+    ['click', 'keydown', 'scroll'].forEach(evt => {
+      document.addEventListener(evt, () => GRADES_PREFETCH.start(), { passive: true });
+    });
     
     function getGradesCached(key) {
       const cache = GRADES_CACHE[key];
