@@ -6,9 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title> Attendance System | Eduneers </title>
   <link rel="manifest" href="manifest.json">
-  <script src="https://unpkg.com/html5-qrcode"></script>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/chart.js" as="script">
+  <script src="https://unpkg.com/html5-qrcode" defer></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
@@ -927,17 +929,108 @@
       animation: popIn 0.3s ease;
     }
 
-    @keyframes popIn {
-      from {
-        transform: translate(-50%, 20px);
-        opacity: 0;
-      }
+@keyframes popIn {
+            from {
+                transform: translate(-50%, 20px);
+                opacity: 0;
+            }
 
-      to {
-        transform: translate(-50%, 0);
-        opacity: 1;
-      }
-    }
+            to {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
+        }
+
+        /* 🎨 Enhanced Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Apply enhanced animations */
+        .animate-fadeInUp {
+            animation: fadeInUp 0.4s ease-out forwards;
+        }
+
+        .animate-shimmer {
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        .animate-pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .animate-slideIn {
+            animation: slideInRight 0.3s ease-out forwards;
+        }
+
+        .animate-scaleIn {
+            animation: scaleIn 0.3s ease-out forwards;
+        }
+
+        /* Skeleton Loader Styles */
+        .skeleton-block {
+            background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        body.dark-mode .skeleton-block {
+            background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+        }
+
+        .skeleton-row td {
+            padding: 12px 15px;
+        }
+
+        .skeleton-card {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
 
     #offlineBadge {
       display: none;
@@ -1841,10 +1934,10 @@
         <div style="text-align: center; margin-bottom: 30px;">
 
           <img src="https://aawyndbhkgiombfqinyf.supabase.co/storage/v1/object/public/new/BIM%20sesion%20(2).png"
-            alt="Eduneers Logo" class="logo-light">
+            alt="Eduneers Logo" class="logo-light" loading="lazy" decoding="async">
 
           <img src="https://aawyndbhkgiombfqinyf.supabase.co/storage/v1/object/public/new/BIM%20sesion%20(4).png"
-            alt="Eduneers Logo" class="logo-dark">
+            alt="Eduneers Logo" class="logo-dark" loading="lazy" decoding="async">
 
           <h2 style="color:var(--primary); margin-top:0; font-size: 28px; font-weight: 800; letter-spacing: 1px;">تسجيل
             الدخول</h2>
@@ -1891,6 +1984,53 @@
     };
     const CACHE_TTL = 30000; // 30 seconds cache
     
+    // Prefetch system - loads data in background when idle
+    const PREFETCH = {
+      enabled: true,
+      idleTime: 3000, // Start after 3s of idle
+      timeout: null,
+      
+      start: function() {
+        if (!this.enabled || this.timeout) return;
+        this.timeout = setTimeout(() => this.prefetchData(), this.idleTime);
+      },
+      
+      cancel: function() {
+        if (this.timeout) {
+          clearTimeout(this.timeout);
+          this.timeout = null;
+        }
+      },
+      
+      prefetchData: function() {
+        this.enabled = false;
+        this.timeout = null;
+        
+        // Prefetch dashboard data for next lecture
+        const currentLec = parseInt(document.getElementById('lecture')?.value || 1);
+        const nextLec = currentLec < 20 ? currentLec + 1 : 1;
+        const group = localStorage.getItem('userGroup') || "Group A";
+        
+        // Fire and forget - don't wait for response
+        fetch(`${getEffectiveApi(ATTENDANCE_API_URL)}?action=getDashboard&lectureNum=${nextLec}&group=${encodeURIComponent(group)}${getAuthParams()}`, { 
+          method: 'HEAD' // Only check headers, no body
+        }).catch(() => {});
+        
+        // Prefetch analytics
+        fetch(`${getEffectiveApi(ATTENDANCE_API_URL)}?action=getAnalytics&group=${encodeURIComponent(group)}${getAuthParams()}`, {
+          method: 'HEAD'
+        }).catch(() => {});
+      }
+    };
+    
+    // Track user activity to start prefetch
+    const activityEvents = ['click', 'keydown', 'scroll', 'mousemove'];
+    activityEvents.forEach(evt => {
+      document.addEventListener(evt, () => {
+        PREFETCH.start();
+      }, { passive: true });
+    });
+    
     function getCachedData(key) {
       const cache = CACHE[key];
       if (cache && cache.data && (Date.now() - cache.timestamp < CACHE_TTL)) {
@@ -1912,10 +2052,62 @@
       }
     }
 
-    let offlineQueue = JSON.parse(localStorage.getItem('offlineQueue')) || [];
-    const MAX_OFFLINE_RECORDS = 100;
-    const OFFLINE_STORAGE_KEY = 'offlineQueue';
-    const LAST_OFFLINE_SYNC = 'lastOfflineSync';
+    // ==================== SECURITY LAYER ====================
+    const SECURITY = {
+      // Rate limiting - max requests per time window
+      rateLimit: {
+        maxRequests: 10,
+        windowMs: 5000, // 5 seconds
+        requests: [],
+        check: function() {
+          const now = Date.now();
+          this.requests = this.requests.filter(t => now - t < this.windowMs);
+          if (this.requests.length >= this.maxRequests) {
+            return false;
+          }
+          this.requests.push(now);
+          return true;
+        }
+      },
+      
+      // Input sanitization
+      sanitizeInput: function(input) {
+        if (!input || typeof input !== 'string') return '';
+        return input
+          .trim()
+          .replace(/[<>'";&]/g, '') // Remove dangerous chars
+          .replace(/javascript:/gi, '')
+          .replace(/on\w+=/gi, '');
+      },
+      
+      // Validate student code format
+      validateCode: function(code) {
+        if (!code) return false;
+        // Format: Letter + Number + EDUR9
+        const validPattern = /^[A-Za-z]+\d+EDUR9$/i;
+        return validPattern.test(code.trim());
+      },
+      
+      // Validate lecture number
+      validateLec: function(lec) {
+        const num = parseInt(lec);
+        return !isNaN(num) && num >= 1 && num <= 20;
+      },
+      
+      // Check HTTPS (for Google Apps Script, HTTPS is enforced server-side)
+      requireHTTPS: function() {
+        return window.location.protocol === 'https:';
+      }
+    };
+    
+    // Rate limit wrapper for fetch
+    function secureFetch(url, options = {}) {
+      if (!SECURITY.rateLimit.check()) {
+        showToast("⚠️太多 طلبات - يرجى الانتظار", "warning");
+        return Promise.reject(new Error('Rate limited'));
+      }
+      return fetch(url, options);
+    }
     
     function convertNumerals(str) {
       if (!str) return "";
@@ -2347,7 +2539,14 @@
       let rawCode = document.getElementById('manualCode').value.trim();
       if (rawCode === "") return showToast("❌ برجاء كتابة الكود", "error");
 
-      let code = convertNumerals(rawCode);
+      // Security: Sanitize and validate
+      let sanitizedCode = SECURITY.sanitizeInput(rawCode);
+      if (sanitizedCode.length < 2 || sanitizedCode.length > 20) {
+        showToast("❌ الكود shorter than required", "error");
+        return;
+      }
+
+      let code = convertNumerals(sanitizedCode);
 
       if (/^\d+$/.test(code)) {
         const userRole = localStorage.getItem('userRole').toUpperCase();
@@ -2366,9 +2565,31 @@
 
    function sendDataToAPI(studentCode) {
       if (!studentCode) return;
-      if (_isScanning) return; // Prevent double submit
+      if (_isScanning) return;
       _isScanning = true;
       
+      // Security: Sanitize input
+      let sanitizedCode = SECURITY.sanitizeInput(studentCode);
+      
+      // Security: Validate format
+      if (!SECURITY.validateCode(sanitizedCode)) {
+        showToast("❌ كود غير صالح", "error");
+        playBeep('error');
+        _isScanning = false;
+        return;
+      }
+      
+      // Security: Check rate limit
+      if (!SECURITY.rateLimit.check()) {
+        showToast("⚠️ many requests - wait please", "warning");
+        _isScanning = false;
+        return;
+      }
+      
+      return _sendDataToAPI(sanitizedCode);
+    }
+    
+    function _sendDataToAPI(studentCode) {
       studentCode = studentCode.toUpperCase();
       if (!studentCode.endsWith("EDUR9")) { studentCode = studentCode + "EDUR9"; }
 
@@ -2381,7 +2602,16 @@
         }
       }
 
-      const lec = document.getElementById('lecture').value; const group = localStorage.getItem('userGroup') || "Group A";
+      // Security: Validate lecture number
+      const lecInput = document.getElementById('lecture').value;
+      if (!SECURITY.validateLec(lecInput)) {
+        showToast("❌ رقم محاضرة غير صالح", "error");
+        _isScanning = false;
+        return;
+      }
+      
+      const lec = lecInput; 
+      const group = localStorage.getItem('userGroup') || "Group A";
 
       // Check online status
       const isOnline = navigator.onLine && window.navigator.onLine;
@@ -2448,8 +2678,8 @@
       const group = localStorage.getItem('userGroup') || "Group A";
       const tbody = document.getElementById('attendeesList');
       
-      // Use cache if valid
-      if (useCache) {
+      // Show skeleton loader instead of text
+      tbody.innerHTML = renderSkeletonRows(5, 4);
         const cached = getCachedData('dashboard');
         if (cached && cached.lec === lec && cached.group === group) {
           completeProgress();
@@ -2465,8 +2695,41 @@
         }
       }
       
-      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 30px;">⏳ المزامنة...</td></tr>`;
-      showProgress("سحب بيانات الحضور...");
+      // ==================== SKELETON LOADERS ====================
+    function renderSkeletonRows(count = 5, cols = 4) {
+      let html = '';
+      for (let i = 0; i < count; i++) {
+        html += `<tr class="skeleton-row${i === 0 ? ' animate-shimmer' : ''}">`;
+        for (let j = 0; j < cols; j++) {
+          html += `<td><div class="skeleton-block" style="height:${j === 1 ? '18px' : '14px'}; width:${j === 0 ? '80px' : j === 1 ? '60%' : '40px'};"></div></td>`;
+        }
+        html += `</tr>`;
+      }
+      return html;
+    }
+
+    function renderSkeletonCards(count = 4) {
+      let html = '';
+      for (let i = 0; i < count; i++) {
+        html += `
+          <div class="leader-card skeleton-card${i === 0 ? ' animate-pulse' : ''}" style="padding: 15px 20px; margin-bottom: 12px;">
+            <div class="skeleton-block" style="width: 40px; height: 40px; border-radius: 50%;"></div>
+            <div style="flex: 1; padding: 0 15px;">
+              <div class="skeleton-block" style="height: 16px; width: 70%; margin-bottom: 8px;"></div>
+              <div class="skeleton-block" style="height: 12px; width: 40%;"></div>
+            </div>
+            <div class="skeleton-block" style="width: 60px; height: 30px; border-radius: 20px;"></div>
+          </div>`;
+      }
+      return html;
+    }
+
+    function showSkeletonLoader() {
+      return `
+        <div class="table-container" style="padding: 20px;">
+          ${renderSkeletonRows(5, 4)}
+        </div>`;
+    }
       
       fetch(`${getEffectiveApi(ATTENDANCE_API_URL)}?action=getDashboard&lectureNum=${encodeURIComponent(lec)}&group=${encodeURIComponent(group)}${getAuthParams()}`)
         .then(res => res.json()).then(data => {
@@ -2926,6 +3189,44 @@
         processRequest(null, null, null);
       }
     }
+  </script>
+  <script>
+    // ==================== KEYBOARD SHORTCUTS ====================
+    const KEYBOARD_SHORTCUTS = {
+      bindings: new Map(),
+      
+      init: function() {
+        // C = Camera
+        this.bindings.set('c', () => { switchView('scanner'); document.getElementById('manualCode')?.focus(); });
+        // M = Manual
+        this.bindings.set('m', () => { switchView('manual'); document.getElementById('manualCode').focus(); });
+        // D = Dashboard
+        this.bindings.set('d', () => { switchView('dashboard'); loadDashboard(false); });
+        // A = Analytics
+        this.bindings.set('a', () => { switchView('analytics'); fetchAnalyticsData(); });
+        // L = Dark/Light
+        this.bindings.set('l', toggleDarkMode);
+        // S = Sidebar
+        this.bindings.set('s', toggleSidebar);
+        
+        document.addEventListener('keydown', (e) => {
+          const isInput = document.activeElement?.tagName === 'INPUT';
+          if (isInput && !['Escape'].includes(e.key)) return;
+          
+          const action = this.bindings.get(e.key.toLowerCase());
+          if (action && !e.ctrlKey && !e.metaKey) {
+            e.preventDefault();
+            action();
+          }
+          
+          if (e.key === '?') {
+            showToast('⌨️ C | M | D | A | L | S', 'info');
+          }
+        });
+      }
+    };
+    
+    KEYBOARD_SHORTCUTS.init();
   </script>
   <script>
     if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(err => console.log('PWA Error', err)); }); }
