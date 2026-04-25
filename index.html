@@ -3197,13 +3197,21 @@
       
       init: function() {
         // C = Camera
-        this.bindings.set('c', () => { switchView('scanner'); document.getElementById('manualCode')?.focus(); });
+        this.bindings.set('c', () => { 
+          try { switchView('scanner'); document.getElementById('manualCode')?.focus(); } catch(e) {} 
+        });
         // M = Manual
-        this.bindings.set('m', () => { switchView('manual'); document.getElementById('manualCode').focus(); });
+        this.bindings.set('m', () => { 
+          try { switchView('manual'); document.getElementById('manualCode').focus(); } catch(e) {} 
+        });
         // D = Dashboard
-        this.bindings.set('d', () => { switchView('dashboard'); loadDashboard(false); });
+        this.bindings.set('d', () => { 
+          try { switchView('dashboard'); loadDashboard(false); } catch(e) {} 
+        });
         // A = Analytics
-        this.bindings.set('a', () => { switchView('analytics'); fetchAnalyticsData(); });
+        this.bindings.set('a', () => { 
+          try { switchView('analytics'); fetchAnalyticsData(); } catch(e) {} 
+        });
         // L = Dark/Light
         this.bindings.set('l', toggleDarkMode);
         // S = Sidebar
