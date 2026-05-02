@@ -4,35 +4,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title> Eduneers | Grades System </title>
+    <title>Eduneers | Grades System</title>
     <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preload" href="https://cdn.jsdelivr.net/npm/chart.js" as="script">
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@400;700;900&display=swap');
 
         :root {
-            --primary: #0f172a;
-            --primary-light: #1e293b;
-            --accent: #f5b041;
-            --accent-glow: rgba(245, 176, 65, 0.6);
+            --primary: #050505;
+            --primary-light: #111111;
+            --accent: #F7A823;
+            --accent-glow: rgba(247, 168, 35, 0.6);
             --electric-blue: #00d2ff;
             --electric-glow: rgba(0, 210, 255, 0.5);
-            --bg-gradient: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-            --text-main: #334155;
-            --text-muted: #64748b;
-            --card-bg: rgba(255, 255, 255, 0.9);
-            --border-radius: 24px;
+            --bg-gradient: radial-gradient(ellipse at top right, #0a0a1a 0%, #000000 100%);
+            --text-main: #f0f0f0;
+            --text-muted: #7a7a9a;
+            --card-bg: rgba(12, 12, 28, 0.92);
+            --card-border: rgba(255, 255, 255, 0.07);
+            --border-radius: 20px;
+            --navbar-bg: rgba(8, 8, 20, 0.95);
         }
 
         body.dark-mode {
-            --primary: #f8fafc;
-            --bg-gradient: radial-gradient(circle at top right, #1e293b 0%, #0f172a 100%);
-            --text-main: #f8fafc;
-            --text-muted: #cbd5e1;
-            --card-bg: rgba(15, 23, 42, 0.9);
+            --primary: #ffffff;
+            --bg-gradient: #000000;
+            --text-main: #e8e8ff;
+            --text-muted: #6666aa;
+            --card-bg: rgba(5, 5, 5, 0.93);
+            --card-border: rgba(247, 168, 35, 0.08);
+            --navbar-bg: rgba(0, 0, 0, 0.99);
+        }
+
+        body.dark-mode { background-color: #000000 !important; }
+        body.dark-mode .glass-panel, body.dark-mode .dashboard-card {
+            background: rgba(6, 6, 6, 0.95);
+            border: 1px solid rgba(247, 168, 35, 0.12);
+        }
+        body.dark-mode .form-wrapper {
+            background: rgba(4, 4, 4, 0.97);
+            border: 1px solid rgba(247, 168, 35, 0.15);
+        }
+
+        /* Atom Canvas */
+        #atom-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        body:not(.dark-mode) {
+            --primary: #1a1a3e;
+            --primary-light: #2a2a5e;
+            --bg-gradient: radial-gradient(ellipse at top right, #f0f4ff 0%, #e4e9f8 100%);
+            --text-main: #1a1a3e;
+            --text-muted: #55557a;
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --card-border: rgba(0, 0, 0, 0.09);
+            --navbar-bg: rgba(255, 255, 255, 0.97);
+        }
+
+        body:not(.dark-mode) .sidebar {
+            background: linear-gradient(180deg, rgba(240, 244, 255, 0.99) 0%, rgba(232, 238, 252, 0.99) 100%);
+            border-left: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: -8px 0 40px rgba(0, 0, 0, 0.12);
+        }
+
+        body:not(.dark-mode) .sidebar-header {
+            border-bottom-color: rgba(0, 0, 0, 0.06);
+        }
+
+        body:not(.dark-mode) .sidebar-nav-item {
+            color: var(--text-main);
+        }
+
+        body:not(.dark-mode) .sidebar-nav-item:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        body:not(.dark-mode) .sidebar-section-label {
+            color: var(--text-muted);
+            border-bottom-color: rgba(0, 0, 0, 0.06);
+        }
+
+        body:not(.dark-mode) input,
+        body:not(.dark-mode) select {
+            background: rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            color: #1a1a3e;
+        }
+
+        body:not(.dark-mode) input:focus,
+        body:not(.dark-mode) select:focus {
+            background: rgba(0, 0, 0, 0.02);
+            border-color: var(--electric-blue);
+        }
+
+        body:not(.dark-mode) input::placeholder {
+            color: #8888aa;
+        }
+
+        body:not(.dark-mode) .nav-btn:hover {
+            background: rgba(0, 0, 0, 0.07);
+            color: #1a1a3e;
+        }
+
+        body:not(.dark-mode) .circuit-bg {
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(0, 150, 200, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(192, 132, 252, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(0, 150, 200, 0.02) 2px, transparent 2px);
+        }
+
+        body:not(.dark-mode) .filter-box {
+            background: rgba(255, 255, 255, 0.7);
+            border-color: rgba(0, 0, 0, 0.07);
+        }
+
+        body:not(.dark-mode) table th {
+            background: rgba(0, 0, 0, 0.04);
+            color: var(--text-main);
+        }
+
+        body:not(.dark-mode) table td {
+            border-bottom-color: rgba(0, 0, 0, 0.05);
+            color: var(--text-main);
+        }
+
+        body:not(.dark-mode) .settings-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        body:not(.dark-mode) .settings-card.subtle {
+            border-color: rgba(0, 0, 0, 0.06);
+        }
+
+        body:not(.dark-mode) .settings-card p {
+            color: var(--text-muted);
+        }
+
+        body:not(.dark-mode) #particles-js canvas {
+            opacity: 0.25;
         }
 
         body {
@@ -41,9 +160,16 @@
             margin: 0;
             color: var(--text-main);
             min-height: 100vh;
-            transition: 0.5s;
+            transition: background 0.6s ease, color 0.4s ease;
             overflow-x: hidden;
         }
+
+        /* AMOLED Scrollbar */
+        body.dark-mode ::-webkit-scrollbar { width: 6px; height: 6px; }
+        body.dark-mode ::-webkit-scrollbar-track { background: #000; }
+        body.dark-mode ::-webkit-scrollbar-thumb { background: rgba(247,168,35,0.35); border-radius: 3px; }
+        body.dark-mode ::-webkit-scrollbar-thumb:hover { background: rgba(247,168,35,0.6); }
+
 
         .circuit-bg {
             position: fixed;
@@ -52,72 +178,104 @@
             width: 110vw;
             height: 110vh;
             z-index: -1;
-            background-image: radial-gradient(circle at 50% 50%, rgba(245, 176, 65, 0.05) 2px, transparent 2px);
-            background-size: 40px 40px;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(0, 210, 255, 0.04) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(247, 168, 35, 0.04) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(247, 168, 35, 0.03) 2px, transparent 2px);
+            background-size: 100% 100%, 100% 100%, 40px 40px;
             animation: pulseCircuit 12s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
             pointer-events: none;
-        }
-
-        body.dark-mode .circuit-bg {
-            background-image: radial-gradient(circle at 50% 50%, rgba(0, 210, 255, 0.1) 2px, transparent 3px);
+            transition: opacity 0.6s;
         }
 
         @keyframes pulseCircuit {
-            0% {
-                opacity: 0.3;
-                transform: scale(1);
-            }
-
-            100% {
-                opacity: 0.8;
-                transform: scale(1.05);
-            }
+            0% { opacity: 0.4; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.03); }
         }
 
-        /* 💎 Navbar */
+        /* ===== NAVBAR ===== */
         .navbar {
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(16px);
+            background: var(--navbar-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
             color: white;
-            padding: 12px 0;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            padding: 0;
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05), 0 4px 40px rgba(0, 0, 0, 0.5);
             position: sticky;
             top: 0;
             z-index: 100;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
+        .navbar::after {
+            content: '';
+            display: block;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #c084fc, var(--electric-blue), #c084fc, transparent);
+            opacity: 0.6;
+        }
+
         .nav-content {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 0 15px;
+            padding: 0 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            width: 100%;
+            height: 64px;
             box-sizing: border-box;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, rgba(192, 132, 252, 0.15), rgba(0, 210, 255, 0.1));
+            border: 1px solid rgba(192, 132, 252, 0.3);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
 
         .nav-brand h2 {
             margin: 0;
-            font-size: 1.3rem;
-            font-weight: 800;
             display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #fff;
+            flex-direction: column;
+            line-height: 1;
+            gap: 2px;
         }
 
-        .nav-brand h2 .brand-text {
-            background: linear-gradient(to left, #fff, #9333ea);
+        .nav-brand .brand-main {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #fff 30%, #c084fc);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        body.dark-mode .nav-brand h2 .brand-text {
-            background: linear-gradient(to left, #fff, var(--electric-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .nav-brand .brand-sub {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.45rem;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            -webkit-text-fill-color: var(--text-muted);
+        }
+
+        #welcomeName {
+            font-size: 0.85rem;
+            color: var(--accent);
+            opacity: 0.9;
+            font-weight: 700;
+            margin-right: 8px;
         }
 
         .nav-actions {
@@ -127,75 +285,138 @@
         }
 
         .nav-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             color: white;
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: 0.3s;
+            flex-shrink: 0;
+            transition: all 0.25s;
             font-size: 1.1rem;
+            padding: 0;
+            margin: 0;
         }
 
         .nav-btn:hover {
-            background: var(--accent);
-            border-color: var(--accent);
+            background: rgba(192, 132, 252, 0.15);
+            border-color: rgba(192, 132, 252, 0.5);
+            box-shadow: 0 0 12px rgba(192, 132, 252, 0.2);
+            color: #c084fc;
         }
 
-        /* 🗂️ Sidebar */
+        /* ===== SIDEBAR ===== */
         .sidebar {
             position: fixed;
             top: 0;
-            right: -300px;
-            width: 280px;
-            height: 100%;
-            background: var(--card-bg);
-            backdrop-filter: blur(25px);
+            right: -310px;
+            width: 290px;
+            height: 100vh;
+            height: 100dvh;
+            background: linear-gradient(180deg, rgba(10, 10, 24, 0.98) 0%, rgba(6, 6, 16, 0.99) 100%);
+            backdrop-filter: blur(30px);
             z-index: 2000;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-align: right;
             padding-top: 60px;
-            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.2);
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 120px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: -8px 0 40px rgba(0, 0, 0, 0.5);
+            border-left: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .sidebar.open {
             right: 0;
         }
 
+        .sidebar-header {
+            padding: 20px 20px 16px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 12px;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
         .sidebar a {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 16px 25px;
-            color: var(--text-main);
+            padding: 12px 18px;
+            color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
             font-weight: 700;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            transition: 0.3s;
-            margin: 5px 10px;
+            font-size: 14px;
+            transition: all 0.25s;
+            margin: 2px 10px;
             border-radius: 12px;
-        }
-
-        .sidebar a i {
-            font-size: 1.2rem;
-            width: 25px;
+            border: 1px solid transparent;
         }
 
         .sidebar a:hover {
-            background: rgba(0, 0, 0, 0.05);
-            transform: translateX(-5px);
-            color: var(--accent);
+            background: rgba(192, 132, 252, 0.08);
+            border-color: rgba(192, 132, 252, 0.2);
+            color: #c084fc;
+            transform: translateX(-4px);
         }
 
         .sidebar a.active {
-            background: linear-gradient(135deg, rgba(245, 176, 65, 0.1), rgba(245, 176, 65, 0.05));
-            color: var(--accent);
-            box-shadow: inset 3px 0 0 var(--accent);
+            background: linear-gradient(135deg, rgba(192, 132, 252, 0.12), rgba(192, 132, 252, 0.05));
+            border-color: rgba(192, 132, 252, 0.3);
+            color: #c084fc;
+        }
+
+        .sidebar-section {
+            margin: 8px 12px;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            overflow: hidden;
+        }
+
+        .sidebar-section.purple {
+            border-color: rgba(192, 132, 252, 0.25);
+        }
+
+        .sidebar-section.gold {
+            border-color: rgba(245, 176, 65, 0.25);
+        }
+
+        .sidebar-section-title {
+            padding: 8px 16px;
+            font-weight: 900;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(0, 210, 255, 0.1);
+            color: #00d2ff;
+            background: rgba(0, 210, 255, 0.06);
+        }
+
+        .sidebar-section.purple .sidebar-section-title {
+            color: #c084fc;
+            border-color: rgba(192, 132, 252, 0.1);
+            background: rgba(192, 132, 252, 0.06);
+        }
+
+        .sidebar-section.gold .sidebar-section-title {
+            color: #f5b041;
+            border-color: rgba(245, 176, 65, 0.1);
+            background: rgba(245, 176, 65, 0.06);
+        }
+
+        .sidebar-section-links {
+            padding: 6px 0;
         }
 
         .sidebar-overlay {
@@ -204,10 +425,10 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.7);
             display: none;
             z-index: 1500;
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(6px);
         }
 
         .sidebar-overlay.show {
@@ -218,41 +439,67 @@
             position: absolute;
             top: 15px;
             left: 15px;
-            font-size: 2rem;
+            font-size: 1.8rem;
             cursor: pointer;
             color: var(--text-muted);
             border: none;
             background: none;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            transition: all 0.2s;
         }
 
+        .close-btn:hover {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        /* ===== CONTAINER & VIEWS ===== */
         .container {
-            padding: 20px 15px;
-            max-width: 1000px;
+            padding: 20px 16px 40px;
+            max-width: 1100px;
             margin: auto;
         }
 
         .view-section {
             display: none !important;
             background: var(--card-bg);
-            padding: 30px 25px;
-            border-radius: var(--border-radius);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 32px 28px;
+            border-radius: 24px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--card-border);
+            border: 1px solid var(--card-border);
             margin-bottom: 25px;
-            backdrop-filter: blur(15px);
-            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .view-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(192, 132, 252, 0.4), transparent);
+            opacity: 0.6;
         }
 
         .view-section.active {
             display: block !important;
-            animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         @keyframes slideUpFade {
             0% {
                 opacity: 0;
-                transform: translateY(40px) scale(0.96);
-                filter: blur(5px);
+                transform: translateY(30px) scale(0.97);
+                filter: blur(4px);
             }
 
             100% {
@@ -262,42 +509,48 @@
             }
         }
 
-        /* Inputs & Toggles */
+        /* ===== INPUTS ===== */
         input,
         select {
             width: 100%;
-            padding: 14px;
+            padding: 14px 18px;
             border-radius: 14px;
-            border: 2px solid transparent;
-            background-color: rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.04);
             color: var(--text-main);
             font-size: 15px;
-            font-weight: 800;
-            margin-bottom: 15px;
+            font-weight: 700;
+            margin-bottom: 14px;
             box-sizing: border-box;
             text-align: center;
             font-family: 'Cairo';
-            transition: 0.3s;
-        }
-
-        body.dark-mode input,
-        body.dark-mode select {
-            background-color: #1e293b;
-            color: #fff;
-            border: 1px solid #334155;
+            transition: all 0.3s;
+            outline: none;
         }
 
         input:focus,
         select:focus {
-            border-color: var(--accent);
-            outline: none;
-            background: #fff;
+            border-color: rgba(192, 132, 252, 0.6);
+            background: rgba(192, 132, 252, 0.04);
+            box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.1);
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        body.dark-mode input,
+        body.dark-mode select {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #e8e8ff;
         }
 
         body.dark-mode input:focus,
         body.dark-mode select:focus {
             border-color: var(--electric-blue);
-            background: #0f172a;
+            background: rgba(0, 210, 255, 0.04);
+            box-shadow: 0 0 0 3px rgba(0, 210, 255, 0.1);
         }
 
         .small-input {
@@ -305,165 +558,179 @@
             display: inline-block;
             padding: 8px 5px !important;
             margin: 0 5px !important;
-            border: 2px solid var(--accent) !important;
-            color: inherit !important;
-            background: transparent !important;
+            border: 1px solid rgba(247, 168, 35, 0.5) !important;
+            background: rgba(247, 168, 35, 0.05) !important;
             font-weight: 900 !important;
         }
 
+        /* ===== BUTTONS ===== */
         .btn-submit {
             width: 100%;
-            padding: 16px;
+            padding: 15px 18px;
             border-radius: 14px;
             border: none;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            background: linear-gradient(135deg, #1e1e3a, #0f0f28);
             color: white;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 800;
             cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
             margin-top: 10px;
+            font-family: 'Cairo';
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-submit::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, transparent 60%);
+            pointer-events: none;
         }
 
         body.dark-mode .btn-submit {
             background: linear-gradient(135deg, var(--electric-blue), #0284c7);
             color: #fff;
-            box-shadow: 0 5px 15px rgba(0, 210, 255, 0.2);
+            box-shadow: 0 6px 20px rgba(0, 210, 255, 0.2);
         }
 
         .btn-submit:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
         }
 
+        .btn-submit:active {
+            transform: scale(0.97);
+        }
+
+        /* ===== TOGGLE BUTTONS ===== */
         .grid-3 {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 15px;
+            gap: 10px;
+            margin-bottom: 16px;
         }
 
         .grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-bottom: 16px;
         }
 
         .toggle-btn {
-            background: rgba(0, 0, 0, 0.05);
-            color: var(--text-muted);
-            padding: 14px 5px;
-            border-radius: 12px;
-            font-size: 0.8rem;
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.5);
+            padding: 16px 8px;
+            border-radius: 14px;
+            font-size: 0.82rem;
             font-weight: 800;
             cursor: pointer;
             text-align: center;
-            transition: 0.2s;
-            border: 2px solid transparent;
+            transition: all 0.25s;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            user-select: none;
         }
 
-        body.dark-mode .toggle-btn {
-            background: #1e293b;
-            border-color: #334155;
+        .toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.07);
+            color: rgba(255, 255, 255, 0.8);
         }
 
-        /* 🔴 إصلاح الأزرار في الوايت مود والدارك مود لتكون زاهية جداً */
         .toggle-btn.active-att {
-            background: #2563eb !important;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
             color: white !important;
-            border-color: #2563eb !important;
-            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3) !important;
+            border-color: rgba(37, 99, 235, 0.5) !important;
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35) !important;
         }
 
         .toggle-btn.active-feed {
-            background: #059669 !important;
+            background: linear-gradient(135deg, #059669, #047857) !important;
             color: white !important;
-            border-color: #059669 !important;
-            box-shadow: 0 4px 10px rgba(5, 150, 105, 0.3) !important;
+            border-color: rgba(5, 150, 105, 0.5) !important;
+            box-shadow: 0 6px 20px rgba(5, 150, 105, 0.35) !important;
         }
 
         .toggle-btn.active-attit {
-            background: #9333ea !important;
+            background: linear-gradient(135deg, #9333ea, #7c3aed) !important;
             color: white !important;
-            border-color: #9333ea !important;
-            box-shadow: 0 4px 10px rgba(147, 51, 234, 0.3) !important;
+            border-color: rgba(147, 51, 234, 0.5) !important;
+            box-shadow: 0 6px 20px rgba(147, 51, 234, 0.35) !important;
         }
 
         body.dark-mode .toggle-btn.active-att {
-            background: #3b82f6 !important;
-            border-color: #3b82f6 !important;
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5) !important;
+            background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5) !important;
         }
 
         body.dark-mode .toggle-btn.active-feed {
-            background: #10b981 !important;
-            border-color: #10b981 !important;
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.5) !important;
+            background: linear-gradient(135deg, #10b981, #059669) !important;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.5) !important;
         }
 
         body.dark-mode .toggle-btn.active-attit {
-            background: #a855f7 !important;
-            border-color: #a855f7 !important;
-            box-shadow: 0 0 15px rgba(168, 85, 247, 0.5) !important;
+            background: linear-gradient(135deg, #a855f7, #9333ea) !important;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.5) !important;
         }
 
-        /* 🏆 Leaderboard */
+        /* ===== FILTER BOX ===== */
         .filter-box {
-            background: rgba(245, 176, 65, 0.05);
-            padding: 15px;
+            background: rgba(247, 168, 35, 0.04);
+            padding: 18px;
             border-radius: 16px;
-            border: 1px dashed var(--accent);
-            margin-bottom: 20px;
+            border: 1px dashed rgba(247, 168, 35, 0.3);
+            margin-bottom: 18px;
             text-align: center;
         }
 
         body.dark-mode .filter-box {
-            background: rgba(0, 210, 255, 0.05);
-            border-color: var(--electric-blue);
+            background: rgba(0, 210, 255, 0.04);
+            border-color: rgba(0, 210, 255, 0.25);
         }
 
+        /* ===== LEADERBOARD ===== */
         .leader-card {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: rgba(0, 0, 0, 0.02);
-            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 16px 20px;
             border-radius: 16px;
-            margin-bottom: 12px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            transition: 0.3s;
-        }
-
-        body.dark-mode .leader-card {
-            background: rgba(255, 255, 255, 0.03);
-            border-color: rgba(255, 255, 255, 0.05);
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.3s;
         }
 
         .leader-card:hover {
             transform: translateX(-5px);
+            background: rgba(255, 255, 255, 0.04);
         }
 
         .rank-1 {
-            border-right: 6px solid #FFD700;
+            border-right: 5px solid #FFD700;
             background: linear-gradient(90deg, rgba(255, 215, 0, 0.08) 0%, transparent 100%);
         }
 
         .rank-2 {
-            border-right: 6px solid #C0C0C0;
-            background: linear-gradient(90deg, rgba(192, 192, 192, 0.08) 0%, transparent 100%);
+            border-right: 5px solid #C0C0C0;
+            background: linear-gradient(90deg, rgba(192, 192, 192, 0.06) 0%, transparent 100%);
         }
 
         .rank-3 {
-            border-right: 6px solid #CD7F32;
-            background: linear-gradient(90deg, rgba(205, 127, 50, 0.08) 0%, transparent 100%);
+            border-right: 5px solid #CD7F32;
+            background: linear-gradient(90deg, rgba(205, 127, 50, 0.06) 0%, transparent 100%);
         }
 
         .leader-rank {
             font-size: 1.5rem;
             font-weight: 900;
-            width: 45px;
+            width: 48px;
             color: var(--accent);
             text-align: center;
         }
@@ -471,124 +738,193 @@
         .leader-name {
             flex: 1;
             font-weight: 800;
-            font-size: 1.1rem;
-            margin-right: 10px;
+            font-size: 1.05rem;
+            margin-right: 12px;
         }
 
         .leader-score {
-            background: var(--primary);
-            color: white;
-            padding: 6px 15px;
+            background: linear-gradient(135deg, var(--electric-blue), #0284c7);
+            color: #fff;
+            padding: 6px 16px;
             border-radius: 50px;
             font-weight: 900;
-            font-size: 0.9rem;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            font-size: 0.85rem;
+            box-shadow: 0 4px 12px rgba(0, 210, 255, 0.25);
+            font-family: 'Orbitron', monospace;
         }
 
-        body.dark-mode .leader-score {
-            background: var(--electric-blue);
-            color: #000;
-            box-shadow: 0 4px 10px rgba(0, 210, 255, 0.2);
-        }
-
-        /* Tables */
+        /* ===== RESULT TABLE ===== */
         .res-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
-            background: rgba(0, 0, 0, 0.02);
-            border-radius: 12px;
+            margin-top: 16px;
+            border-radius: 14px;
             overflow: hidden;
         }
 
-        body.dark-mode .res-table {
-            background: rgba(0, 0, 0, 0.2);
-        }
-
         .res-table th {
-            background: rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.04);
             padding: 12px;
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        body.dark-mode .res-table th {
-            background: rgba(255, 255, 255, 0.05);
+            font-size: 12px;
+            color: var(--electric-blue);
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(0, 210, 255, 0.15);
         }
 
         .res-table td {
-            padding: 12px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            font-weight: bold;
+            padding: 13px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-weight: 700;
             text-align: center;
+            color: rgba(255, 255, 255, 0.85);
         }
 
-        body.dark-mode .res-table td {
-            border-bottom-color: rgba(255, 255, 255, 0.05);
+        .res-table tr:last-child td {
+            border-bottom: none;
         }
 
+        /* ===== SEARCH BOX ===== */
+        .search-box {
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .search-box input {
+            margin-bottom: 0;
+            padding-right: 46px;
+            border-radius: 14px;
+        }
+
+        /* ===== CHART ===== */
         .chart-container {
             height: 300px;
-            margin-top: 25px;
-            background: rgba(0, 0, 0, 0.02);
-            border-radius: 20px;
-            padding: 15px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            margin-top: 24px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         body.dark-mode .chart-container {
-            background: #1e293b;
-            border-color: #334155;
+            background: rgba(0, 0, 0, 0.3);
         }
 
-        /* ⚡ Loader & Toast */
+        /* ===== LOADER ===== */
         #loader {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(15, 23, 42, 0.95);
+            background: rgba(4, 4, 16, 0.92);
+            backdrop-filter: blur(16px);
             display: none;
             justify-content: center;
             align-items: center;
             flex-direction: column;
             z-index: 9999;
             color: white;
-            backdrop-filter: blur(10px);
+        }
+
+        .loader-ring-g {
+            width: 64px;
+            height: 64px;
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .loader-ring-g::before,
+        .loader-ring-g::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+        }
+
+        .loader-ring-g::before {
+            inset: 0;
+            border: 2px solid rgba(192, 132, 252, 0.2);
+            border-top-color: #c084fc;
+            animation: spin 1s linear infinite;
+        }
+
+        .loader-ring-g::after {
+            inset: 8px;
+            border: 2px solid rgba(0, 210, 255, 0.15);
+            border-bottom-color: var(--electric-blue);
+            animation: spin 1.5s linear infinite reverse;
+        }
+
+        .loader-dot-g {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background: #c084fc;
+            border-radius: 50%;
+            box-shadow: 0 0 16px #c084fc;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .bar-bg {
             width: 70%;
-            max-width: 400px;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
+            max-width: 360px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 10px;
             overflow: hidden;
-            margin: 15px 0;
+            margin: 16px 0;
         }
 
         .bar-fill {
             width: 0%;
             height: 100%;
-            background: var(--electric-blue);
+            background: linear-gradient(90deg, #c084fc, var(--electric-blue));
+            border-radius: 10px;
             transition: 0.1s linear;
-            box-shadow: 0 0 15px var(--electric-blue);
+            box-shadow: 0 0 12px #c084fc;
         }
 
+        #loaderMsg {
+            font-weight: 800;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 4px;
+        }
+
+        #percent {
+            font-size: 22px;
+            font-weight: 900;
+            font-family: 'Orbitron', monospace;
+            color: #c084fc;
+        }
+
+        /* ===== TOAST ===== */
         #toast {
             position: fixed;
-            bottom: 20px;
+            bottom: 24px;
             left: 50%;
             transform: translateX(-50%);
-            padding: 14px 25px;
-            border-radius: 12px;
+            padding: 14px 28px;
+            border-radius: 14px;
             color: white;
-            font-weight: 700;
+            font-weight: 800;
             display: none;
             z-index: 3000;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
             animation: popIn 0.3s ease;
+            font-size: 14px;
+            max-width: 90vw;
+            text-align: center;
         }
 
         @keyframes popIn {
@@ -603,7 +939,7 @@
             }
         }
 
-        /* 🛡️ منطق الصلاحيات الاحترافي */
+        /* ===== PERMISSIONS ===== */
         .manager-only,
         .admin-only,
         .cross-group-only {
@@ -629,6 +965,15 @@
             display: flex !important;
         }
 
+        body.role-cadre-leader :not(.view-section).manager-only,
+        body.role-cadre-leader :not(.view-section).cross-group-only {
+            display: block !important;
+        }
+
+        body.role-cadre-leader a.manager-only {
+            display: flex !important;
+        }
+
         body.role-co-founder :not(.view-section).manager-only,
         body.role-co-founder :not(.view-section).admin-only,
         body.role-co-founder :not(.view-section).cross-group-only {
@@ -646,6 +991,13 @@
             display: block !important;
         }
 
+        body.role-admin #groupBadge,
+        body.role-cadre-leader #groupBadge,
+        body.role-co-founder #groupBadge,
+        body.role-owner #groupBadge {
+            display: none !important;
+        }
+
         body.role-owner a.manager-only,
         body.role-owner a.admin-only {
             display: flex !important;
@@ -657,11 +1009,160 @@
             display: none !important;
         }
 
-        /* 📐 استجابة الشاشات (Responsive Design) */
+        /* ===== BADGES ===== */
+        .nav-badge {
+            font-size: 11px;
+            font-weight: 800;
+            white-space: nowrap;
+            flex-shrink: 0;
+            padding: 5px 12px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-family: 'Orbitron', monospace;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ===== SETTINGS CARDS ===== */
+        .settings-card {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 22px;
+            border-radius: 18px;
+            margin-bottom: 22px;
+            border: 1px dashed rgba(247, 168, 35, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .settings-card.blue {
+            border-color: rgba(0, 210, 255, 0.3);
+        }
+
+        .settings-card.subtle {
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .settings-card h4 {
+            margin: 0 0 8px 0;
+            font-size: 15px;
+            font-weight: 900;
+            color: var(--accent);
+        }
+
+        .settings-card.blue h4 {
+            color: var(--electric-blue);
+        }
+
+        .settings-card.subtle h4 {
+            color: var(--text-main);
+        }
+
+        .settings-card p {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-bottom: 14px;
+            line-height: 1.6;
+        }
+
+        .links-monitor {
+            margin-top: 14px;
+            max-height: 150px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .links-monitor-header {
+            font-size: 11px;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.6);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 6px;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== GLASS & ALIVE EFFECTS ===== */
+        .glass-panel,
+        .action-btn,
+        .dashboard-card {
+            transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease !important;
+        }
+
+        .glass-panel:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px var(--electric-glow) !important;
+            border-color: rgba(0, 210, 255, 0.4) !important;
+        }
+
+        .pulse-glow {
+            animation: neonPulse 2s infinite alternate;
+        }
+
+        @keyframes neonPulse {
+            0% {
+                box-shadow: 0 0 15px var(--electric-glow), 0 0 30px var(--accent-glow);
+            }
+
+            100% {
+                box-shadow: 0 0 30px var(--electric-glow), 0 0 50px var(--accent-glow);
+            }
+        }
+
+        /* ===== CURSOR ===== */
+        .cursor-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 36px;
+            height: 36px;
+            margin-top: -18px;
+            margin-left: -18px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(192, 132, 252, 0.5);
+            background: radial-gradient(circle, rgba(192, 132, 252, 0.15) 0%, transparent 70%);
+            box-shadow: 0 0 12px rgba(192, 132, 252, 0.5);
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate3d(-100px, -100px, 0);
+            transition: width 0.3s, height 0.3s, background 0.3s, border-color 0.3s, margin 0.3s;
+            will-change: transform;
+            mix-blend-mode: screen;
+        }
+
+        body.hovering .cursor-glow {
+            width: 60px;
+            height: 60px;
+            margin-top: -30px;
+            margin-left: -30px;
+            background: radial-gradient(circle, rgba(247, 168, 35, 0.2) 0%, transparent 70%);
+            border-color: rgba(247, 168, 35, 0.8);
+            box-shadow: 0 0 20px rgba(247, 168, 35, 0.7);
+        }
+
+        @media (pointer: fine) {
+            body {
+                cursor: none;
+            }
+
+            a,
+            button,
+            input,
+            select,
+            .glass-panel,
+            .dashboard-card {
+                cursor: none;
+            }
+        }
+
+        /* ===== RESPONSIVE ===== */
         @media (min-width: 1024px) {
             .container {
                 max-width: 1200px;
-                padding: 40px 20px;
+                padding: 40px 20px 50px;
             }
 
             .view-section>div {
@@ -670,31 +1171,12 @@
             }
 
             .view-section {
-                padding: 40px 50px;
+                padding: 44px 52px;
             }
 
             .view-section:hover {
-                transform: translateY(-4px);
-                box-shadow: 0 35px 60px rgba(0, 0, 0, 0.08);
-            }
-
-            body.dark-mode .view-section:hover {
-                box-shadow: 0 35px 60px rgba(0, 210, 255, 0.05);
-                border-color: rgba(0, 210, 255, 0.2);
-            }
-
-            input,
-            select {
-                padding: 18px;
-                font-size: 16px;
-                margin-bottom: 20px;
-                transition: 0.4s ease;
-            }
-
-            .btn-submit {
-                padding: 18px;
-                font-size: 1.1rem;
-                border-radius: 18px;
+                transform: translateY(-3px);
+                box-shadow: 0 32px 64px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--card-border);
             }
 
             .chart-container {
@@ -702,26 +1184,25 @@
             }
 
             .leader-card {
-                padding: 25px;
+                padding: 22px 26px;
             }
 
             .leader-name {
-                font-size: 1.3rem;
+                font-size: 1.2rem;
             }
         }
 
         @media (max-width: 650px) {
-            .nav-brand h2 {
+            .nav-brand .brand-main {
                 font-size: 1.1rem;
-                gap: 4px;
             }
 
-            .nav-brand span#welcomeName {
+            #welcomeName {
                 display: none;
             }
 
             .view-section {
-                padding: 20px 15px;
+                padding: 20px 16px;
             }
 
             h2,
@@ -733,7 +1214,7 @@
             select,
             .btn-submit {
                 font-size: 14px;
-                padding: 12px;
+                padding: 12px 14px;
             }
         }
     </style>
@@ -741,109 +1222,162 @@
 
 <body class="dark-mode">
 
+    <div id="particles-js"
+        style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:-2; pointer-events:none;"></div>
     <div class="circuit-bg"></div>
 
+    <!-- LOADER -->
     <div id="loader">
-        <div
-            style="width:60px; height:60px; margin-bottom:20px; position:relative; display:flex; justify-content:center; align-items:center;">
-            <div
-                style="position:absolute; width:100%; height:100%; border:2px solid var(--electric-blue); border-radius:50%; opacity:0.6; animation: spin 2s linear infinite;">
-            </div>
-            <div
-                style="width:12px; height:12px; background:var(--electric-blue); border-radius:50%; box-shadow: 0 0 20px var(--electric-blue);">
-            </div>
+        <div class="loader-ring-g">
+            <div class="loader-dot-g"></div>
         </div>
-        <div id="loaderMsg" style="font-weight: 800; font-size: 1.1rem; letter-spacing: 1px;">جاري تجميع حزم البيانات...
-        </div>
+        <div id="loaderMsg">جاري تجميع حزم البيانات...</div>
         <div class="bar-bg">
             <div class="bar-fill" id="barFill"></div>
         </div>
-        <div style="font-size: 24px; font-weight: 900; font-family: monospace; color: var(--electric-blue);"
-            id="percent">0%</div>
+        <div id="percent">0%</div>
     </div>
-    <style>
-        @keyframes spin {
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-    </style>
 
+    <!-- NAVBAR -->
     <div class="navbar">
         <div class="nav-content">
             <div class="nav-brand">
-                <h2>⚡ <span class="brand-text">Eduneers</span> <span id="welcomeName"
-                        style="font-size: 11px; opacity:0.7;"></span></h2>
+                <div class="nav-brand-icon">
+                    <i class="fas fa-graduation-cap"
+                        style="color: #c084fc; font-size: 1.2rem; text-shadow: 0 0 12px rgba(192,132,252,0.6);"></i>
+                </div>
+                <h2>
+                    <span class="brand-main">EDUNEERS</span>
+                    <span class="brand-sub">EDUCATION FOR ENGINEERS</span>
+                </h2>
+                <span id="welcomeName"></span>
             </div>
             <div class="nav-actions">
+                <select id="globalGroupSelect" class="cross-group-only"
+                    style="background: rgba(192,132,252,0.1); border: 1px solid rgba(192,132,252,0.4); color: #c084fc; border-radius: 10px; padding: 0 10px; height: 34px; font-size: 11px; font-weight: 800; cursor: pointer; outline: none; margin: 0 4px; display: none; box-sizing: border-box; align-self: center; font-family: 'Cairo'; flex-shrink: 0;"
+                    onchange="changeGlobalGroup(this.value)"></select>
                 <span id="groupBadge"
-                    style="font-size: 11px; font-weight: 800; background: rgba(0, 210, 255, 0.1); color: var(--electric-blue); padding: 5px 10px; border-radius: 8px; border: 1px solid rgba(0, 210, 255, 0.3); display: none;"></span>
-                <button class="nav-btn" onclick="toggleDarkMode()">🌓</button>
+                    style="font-size:11px; font-weight:800; background:rgba(0,210,255,0.1); color:var(--electric-blue); padding:5px 12px; border-radius:20px; border:1px solid rgba(0,210,255,0.3); display:none; white-space:nowrap; flex-shrink:0; font-family:'Orbitron',monospace;"></span>
+                <span id="roleBadge"
+                    style="font-size:11px; font-weight:800; background:rgba(247,168,35,0.1); color:var(--accent); padding:5px 12px; border-radius:20px; border:1px solid rgba(247,168,35,0.3); display:none; white-space:nowrap; flex-shrink:0; font-family:'Orbitron',monospace;"></span>
+                <button class="nav-btn" id="themeToggle" onclick="toggleDarkMode()">🌙</button>
                 <button class="nav-btn" onclick="toggleSidebar()">☰</button>
             </div>
         </div>
     </div>
 
+    <!-- SIDEBAR -->
     <div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
     <div class="sidebar" id="sidebar">
         <button class="close-btn" onclick="toggleSidebar()">×</button>
-        <div
-            style="padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px;">
-            <div style="font-weight: 900; color: var(--electric-blue); font-size: 1.3rem;">نظام التقييم المركزي</div>
+
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-graduation-cap"
+                    style="color: #c084fc; font-size: 1.4rem; text-shadow: 0 0 10px rgba(192,132,252,0.6);"></i>
+                <div style="text-align: left;">
+                    <div
+                        style="font-family:'Orbitron',sans-serif; font-weight:900; letter-spacing:1px; font-size:1rem; color:var(--text-main);">
+                        EDUNEERS</div>
+                    <div
+                        style="font-family:'Orbitron',sans-serif; font-weight:700; font-size:0.4rem; letter-spacing:0.5px; color:var(--text-muted);">
+                        EDUCATION FOR ENGINEERS</div>
+                </div>
+            </div>
             <div id="sideRole"
-                style="font-size: 10px; opacity: 0.7; margin-top: 5px; text-transform: uppercase; background: rgba(255,255,255,0.1); display: inline-block; padding: 4px 10px; border-radius: 8px;">
+                style="font-size:10px; margin-top:8px; text-transform:uppercase; background:rgba(255,255,255,0.07); display:inline-block; padding:4px 12px; border-radius:20px; border:1px solid rgba(255,255,255,0.1); letter-spacing:1px; color:var(--text-muted);">
             </div>
         </div>
 
-        <a href="#" class="active" onclick="switchView('grading'); toggleSidebar();" id="nav-grading">
-            <span>📝</span> <span>رصد الدرجات</span>
-        </a>
-        <a href="#" onclick="switchView('searchView'); toggleSidebar();" id="nav-searchView">
-            <span>🔍</span> <span>استعلام عن طالب</span>
-        </a>
-        <a href="#" class="manager-only" onclick="switchView('topView'); toggleSidebar();" id="nav-topView">
-            <span>🏆</span> <span>لوحة الشرف Top 5</span>
-        </a>
-        <a href="#" class="manager-only" onclick="switchView('settings'); toggleSidebar();" id="nav-settings">
-            <span>⚙️</span> <span>إعدادات النظام</span>
-        </a>
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">📷 قسم الحضور</div>
+            <div class="sidebar-section-links">
+                <a href="#" onclick="gotoView('index.html', 'scanner')" id="nav-scanner"><span>📷</span> <span>مسح الـ
+                        QR</span></a>
+                <a href="#" onclick="gotoView('index.html', 'manual')" id="nav-manual"><span>✍️</span> <span>التسجيل
+                        اليدوي السريع</span></a>
+                <a href="#" onclick="gotoView('index.html', 'dashboard')" id="nav-dashboard"><span>📊</span> <span>لوحة
+                        الحضور</span></a>
+                <a href="#" onclick="gotoView('index.html', 'analytics')" id="nav-analytics"
+                    class="manager-only"><span>📈</span> <span>إحصائيات الجروبات</span></a>
+                <a href="#" onclick="gotoView('index.html', 'mail')" id="nav-mail" class="manager-only"><span>📧</span>
+                    <span>الإعلانات والبريد</span></a>
+            </div>
+        </div>
 
-        <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 15px 25px;"></div>
-        <a href="index.html" style="color: var(--accent);"><span>🏠</span> <span>نظام الحضور</span></a>
-        <a href="#" onclick="logout()" style="color: #ef4444; margin-top: 10px;"><span>🚪</span> <span>تسجيل
-                الخروج</span></a>
+        <div class="sidebar-section purple" style="margin-top: 10px;">
+            <div class="sidebar-section-title">🎯 قسم الدرجات والتقييم</div>
+            <div class="sidebar-section-links">
+                <a href="#" onclick="gotoView('grades.html', 'grading')" id="nav-grading"><span>📝</span> <span>رصد
+                        الدرجات</span></a>
+                <a href="#" onclick="gotoView('grades.html', 'searchView')" id="nav-searchView"><span>🔍</span>
+                    <span>استعلام عن طالب</span></a>
+                <a href="#" onclick="gotoView('grades.html', 'topView')" id="nav-topView"
+                    class="manager-only"><span>🏆</span> <span>لوحة الشرف Top 5</span></a>
+                <a href="#" onclick="gotoView('grades.html', 'settings')" id="nav-settings"
+                    class="manager-only"><span>⚙️</span> <span>إعدادات النظام</span></a>
+            </div>
+        </div>
+
+        <div class="admin-only sidebar-section gold" style="margin-top: 10px;">
+            <div class="sidebar-section-title">⚙️ الإدارة العليا</div>
+            <div class="sidebar-section-links">
+                <a href="#" onclick="gotoView('index.html', 'users')" id="nav-users" class="admin-only"><span>👥</span>
+                    <span>إدارة المستخدمين</span></a>
+            </div>
+        </div>
+
+        <a href="#" onclick="logout()"
+            style="color: #f87171; margin: 14px 12px 0; background: rgba(239,68,68,0.08); border-radius: 12px; text-align: center; justify-content: center; border: 1px solid rgba(239,68,68,0.2);"><span>🚪</span>
+            <span>تسجيل الخروج</span></a>
+        <div style="height: 80px; flex-shrink: 0;"></div>
     </div>
 
+    <!-- CONTAINER -->
     <div class="container">
         <div id="toast"></div>
 
-        <div class="cross-group-only"
-            style="background: var(--card-bg); padding: 15px; border-radius: 16px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); text-align:center; box-shadow: 0 10px 20px rgba(0,0,0,0.05);">
-            <label style="font-weight: 800; color: #c084fc; font-size: 13px; display:block; margin-bottom:10px;">تحكم
-                الجروب 👑</label>
-            <select id="globalGroupSelect"
-                style="margin-bottom:0; max-width: 300px; border-color:#c084fc; color:#c084fc;"
-                onchange="changeGlobalGroup(this.value)"></select>
+        <div class="manager-only">
+            <script>
+                function gotoView(page, view) {
+                    localStorage.setItem('savedView', view);
+                    if (window.location.pathname.endsWith(page)) {
+                        switchView(view);
+                        toggleSidebar();
+                    } else {
+                        window.location.href = page;
+                    }
+                }
+            </script>
         </div>
 
+        <!-- GRADING VIEW -->
         <div id="view-grading" class="view-section active">
-            <div style="max-width: 500px; margin: auto;">
+            <div style="max-width:500px; margin:auto;">
                 <h3
-                    style="color:var(--electric-blue); text-align:center; font-size:24px; font-weight:800; margin-bottom:20px;">
+                    style="color:var(--electric-blue); text-align:center; font-size:22px; font-weight:900; margin-bottom:6px;">
                     رصد تقييم المحاضرة</h3>
+                <p style="text-align:center; color:var(--text-muted); font-size:13px; margin-bottom:22px;">سجّل حضور
+                    وتقييم الطالب لكل محاضرة</p>
 
-                <label style="font-size:13px; font-weight:bold; color:var(--text-muted);">رقم كود الطالب</label>
+                <label
+                    style="font-size:12px; font-weight:900; color:var(--text-muted); display:block; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">🔢
+                    رقم كود الطالب</label>
                 <input type="text" id="studentCode" placeholder="أدخل الرقم فقط (مثال: 15)"
-                    style="font-size:1.4rem; letter-spacing: 2px;">
+                    style="font-size:1.6rem; letter-spacing:4px; font-weight:900; padding:20px; text-align:center; margin-bottom:16px;">
 
-                <div style="margin-bottom: 20px;">
-                    <label style="font-size:13px; font-weight:bold; color:var(--text-muted);">رقم المحاضرة
-                        المستهدفة</label>
+                <div style="margin-bottom:18px;">
+                    <label
+                        style="font-size:12px; font-weight:900; color:var(--text-muted); display:block; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">📖
+                        رقم المحاضرة المستهدفة</label>
                     <select id="currentLecNum" style="margin-bottom:0;">
                         <script>for (let i = 1; i <= 20; i++) document.write(`<option value="${i}">المحاضرة ${i}</option>`);</script>
                     </select>
                 </div>
 
+                <label
+                    style="font-size:12px; font-weight:900; color:var(--text-muted); display:block; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px;">📋
+                    بنود التقييم</label>
                 <div class="grid-3">
                     <div class="toggle-btn" id="attBtn" onclick="this.classList.toggle('active-att')">👤 حضور (15)</div>
                     <div class="toggle-btn" id="feedBtn" onclick="this.classList.toggle('active-feed')">💬 فيدباك (5)
@@ -852,49 +1386,76 @@
                     </div>
                 </div>
 
-                <label style="font-size:13px; font-weight:bold; color:var(--text-muted);">بونص إضافي (Bonus)</label>
-                <input type="number" id="valBonus" placeholder="0">
+                <label
+                    style="font-size:12px; font-weight:900; color:var(--text-muted); display:block; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">🎁
+                    بونص إضافي</label>
+                <input type="number" id="valBonus" placeholder="0" style="margin-bottom:16px;">
 
-                <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:15px 0;">
-
-                <div class="grid-2">
-                    <div><label style="font-size:13px; font-weight:bold; color:var(--text-muted);">درجة
-                            التاسك</label><input type="number" id="valTask" placeholder="من 70"></div>
-                    <div><label style="font-size:13px; font-weight:bold; color:var(--text-muted);">درجة
-                            الكويز</label><input type="number" id="valQuiz" placeholder="الدرجة"></div>
+                <div
+                    style="height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent); margin:16px 0;">
                 </div>
 
-                <button class="btn-submit" onclick="submitData()">حفظ وإرسال التقييم 📡</button>
-            </div>
-        </div>
-
-        <div id="view-searchView" class="view-section">
-            <div style="max-width: 500px; margin: auto;">
-                <h3 style="color:var(--accent); text-align:center; font-size:24px; font-weight:800;">استعلام شامل عن
-                    متدرب</h3>
-
-                <label style="font-size:13px; font-weight:bold; color:var(--text-muted);">رقم الطالب</label>
-                <input type="text" id="searchCode" placeholder="أدخل الرقم...">
-
-                <div class="filter-box">
-                    <label style="font-size:13px; font-weight:bold;">حصر التقييم من محاضرة</label>
+                <div class="grid-2">
                     <div>
-                        <input type="number" id="sfL" value="1" class="small-input"> إلى <input type="number" id="stL"
-                            value="5" class="small-input">
+                        <label
+                            style="font-size:12px; font-weight:900; color:var(--text-muted); display:block; margin-bottom:8px; letter-spacing:0.5px;">📌
+                            درجة التاسك</label>
+                        <input type="number" id="valTask" placeholder="من 70" style="margin-bottom:0;">
+                    </div>
+                    <div>
+                        <label
+                            style="font-size:12px; font-weight:900; color:var(--text-muted); display:block; margin-bottom:8px; letter-spacing:0.5px;">📝
+                            درجة الكويز</label>
+                        <input type="number" id="valQuiz" placeholder="الدرجة" style="margin-bottom:0;">
                     </div>
                 </div>
 
                 <button class="btn-submit"
-                    style="background: linear-gradient(135deg, var(--accent), #d97706); color:#000;"
+                    style="margin-top:20px; background:linear-gradient(135deg, #c084fc, #9333ea); box-shadow:0 8px 24px rgba(147,51,234,0.35);"
+                    onclick="submitData()">حفظ وإرسال التقييم 📡</button>
+            </div>
+        </div>
+
+        <!-- SEARCH VIEW -->
+        <div id="view-searchView" class="view-section">
+            <div style="max-width:500px; margin:auto;">
+                <h3 style="color:var(--accent); text-align:center; font-size:22px; font-weight:900; margin-bottom:6px;">
+                    استعلام شامل عن متدرب</h3>
+                <p style="text-align:center; color:var(--text-muted); font-size:13px; margin-bottom:22px;">تحليل ومراجعة
+                    نقاط الطالب عبر نطاق محاضرات محدد</p>
+
+                <label
+                    style="font-size:12px; font-weight:900; color:var(--text-muted); display:block; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">🔢
+                    رقم الطالب</label>
+                <input type="text" id="searchCode" placeholder="أدخل الرقم...">
+
+                <div class="filter-box">
+                    <label
+                        style="font-size:13px; font-weight:800; display:block; margin-bottom:12px; color:var(--text-main);">📅
+                        حصر التقييم من محاضرة</label>
+                    <div
+                        style="display:flex; align-items:center; justify-content:center; gap:8px; font-weight:800; font-size:14px;">
+                        من <input type="number" id="sfL" value="1" class="small-input"> إلى <input type="number"
+                            id="stL" value="5" class="small-input">
+                    </div>
+                </div>
+
+                <button class="btn-submit"
+                    style="background:linear-gradient(135deg, var(--accent), #d97706); color:#000; box-shadow:0 8px 24px rgba(247,168,35,0.35);"
                     onclick="searchStudent()">🔍 ابدأ التحليل</button>
 
                 <div id="searchResult"
-                    style="display:none; margin-top:25px; background:rgba(0,0,0,0.02); padding:20px; border-radius:16px; border:1px solid rgba(0,0,0,0.05);">
+                    style="display:none; margin-top:24px; background:rgba(255,255,255,0.02); padding:22px; border-radius:18px; border:1px solid rgba(255,255,255,0.07);">
                     <div id="resName"
-                        style="font-weight:900; color:var(--electric-blue); text-align:center; font-size:1.4rem;"></div>
-                    <div style="text-align:center; margin:15px 0;"><span
-                            style="background:var(--accent); color:#000; padding:8px 25px; border-radius:50px; font-weight:900; box-shadow:0 4px 10px rgba(245, 176, 65, 0.3);">إجمالي
-                            النقاط: <span id="resTotal" style="font-size:1.2rem;">0</span></span></div>
+                        style="font-weight:900; color:var(--electric-blue); text-align:center; font-size:1.4rem; margin-bottom:14px;">
+                    </div>
+                    <div style="text-align:center; margin-bottom:18px;">
+                        <span
+                            style="background:linear-gradient(135deg, var(--accent), #e8920a); color:#000; padding:8px 28px; border-radius:50px; font-weight:900; box-shadow:0 6px 18px rgba(247,168,35,0.35); font-size:1rem;">
+                            إجمالي النقاط: <span id="resTotal"
+                                style="font-size:1.2rem; font-family:'Orbitron',monospace;">0</span>
+                        </span>
+                    </div>
                     <table class="res-table">
                         <thead>
                             <tr>
@@ -908,34 +1469,41 @@
             </div>
         </div>
 
+        <!-- TOP VIEW (LEADERBOARD) -->
         <div id="view-topView" class="view-section manager-only">
-            <div style="max-width: 600px; margin: auto;">
+            <div style="max-width:600px; margin:auto;">
                 <h3
-                    style="color:var(--electric-blue); text-align:center; font-size:26px; font-weight:900; margin-bottom:20px;">
+                    style="color:var(--electric-blue); text-align:center; font-size:24px; font-weight:900; margin-bottom:6px;">
                     🏆 لوحة متفوقي الجروب</h3>
+                <p style="text-align:center; color:var(--text-muted); font-size:13px; margin-bottom:22px;">أبطال الجروب
+                    المصنفون حسب إجمالي النقاط</p>
 
                 <div class="filter-box">
-                    <label style="font-size:14px; font-weight:bold; margin-bottom:10px; display:block;">تحديد النطاق
-                        الزمني للتقييم</label>
-                    <div style="display:flex; justify-content:center; align-items:center; gap:10px;">
+                    <label
+                        style="font-size:14px; font-weight:800; margin-bottom:12px; display:block; color:var(--text-main);">📅
+                        تحديد النطاق الزمني للتقييم</label>
+                    <div
+                        style="display:flex; justify-content:center; align-items:center; gap:10px; font-weight:800; font-size:14px;">
                         من <input type="number" id="fL" value="1" class="small-input"> إلى <input type="number" id="tL"
                             value="5" class="small-input">
                     </div>
-                    <div style="font-size: 10px; margin-top: 10px; opacity: 0.7;">(يتم تجميع نقاط: الحضور + الفيدباك +
-                        السلوك + البونص + التاسكات + الكويزات)</div>
+                    <div style="font-size:11px; margin-top:10px; opacity:0.6;">(يتم تجميع: الحضور + الفيدباك + السلوك +
+                        البونص + التاسكات + الكويزات)</div>
                 </div>
 
-                <button class="btn-submit" style="background: linear-gradient(135deg, #10b981, #059669);"
+                <button class="btn-submit"
+                    style="background:linear-gradient(135deg, #10b981, #059669); box-shadow:0 8px 24px rgba(16,185,129,0.35);"
                     onclick="extractLeaderboard()">استخراج ترتيب الجروب 🚀</button>
 
-                <div class="search-box" style="position:relative; margin-top:20px;">
+                <div class="search-box" style="position:relative; margin-top:18px;">
                     <input type="text" id="searchLeaderInput" placeholder="بحث بالاسم أو الكود للفلترة السريعة..."
                         onkeyup="filterLeaderboard()"
-                        style="margin:0; padding:15px; padding-right:45px; box-sizing:border-box; width:100%; text-align: right;">
-                    <span style="position:absolute; right:15px; top:17px; opacity:0.5;">🔍</span>
+                        style="margin:0; padding:14px 46px 14px 14px; box-sizing:border-box; width:100%; text-align:right;">
+                    <span
+                        style="position:absolute; right:16px; top:50%; transform:translateY(-50%); opacity:0.4; pointer-events:none;">🔍</span>
                 </div>
 
-                <div id="leaderboard" style="margin-top: 25px;"></div>
+                <div id="leaderboard" style="margin-top:22px;"></div>
 
                 <div id="chartWrapper" style="display:none;">
                     <div class="chart-container"><canvas id="topChart"></canvas></div>
@@ -943,72 +1511,65 @@
             </div>
         </div>
 
+        <!-- SETTINGS VIEW -->
         <div id="view-settings" class="view-section manager-only">
-            <div style="max-width: 500px; margin: auto;">
+            <div style="max-width:500px; margin:auto;">
                 <h3
-                    style="text-align:center; font-size:24px; font-weight:900; margin-bottom:20px; color:var(--electric-blue);">
+                    style="text-align:center; font-size:22px; font-weight:900; margin-bottom:6px; color:var(--electric-blue);">
                     ⚙️ إعدادات وتوجيه النظام</h3>
+                <p style="text-align:center; color:var(--text-muted); font-size:13px; margin-bottom:24px;">ربط وإدارة
+                    روابط API للجروبات والطلاب الأفراد</p>
 
-                <div
-                    style="background: rgba(0,0,0,0.1); padding: 20px; border-radius: 16px; margin-bottom: 25px; border: 1px dashed var(--accent);">
-                    <h4 style="margin-top:0; color:var(--accent);">🔗 إدارة روابط الدبلومة والجروبات</h4>
-                    <p style="font-size: 11px; opacity:0.8; margin-bottom: 15px;">قم بربط API الخاص بشيت الجروب المركزي.
-                    </p>
-
+                <div class="settings-card">
+                    <h4>🔗 إدارة روابط الدبلومة والجروبات</h4>
+                    <p>قم بربط API الخاص بشيت الجروب المركزي لتوجيه جميع العمليات.</p>
                     <label
-                        style="font-size:12px; font-weight:bold; color:var(--text-muted); display:block; margin-bottom:5px;">رابط
+                        style="font-size:11px; font-weight:900; color:var(--text-muted); display:block; margin-bottom:6px; text-transform:uppercase; letter-spacing:1px;">رابط
                         شيت الجروب الأساسي (Group Scope)</label>
-                    <input type="text" id="groupApiInput" placeholder="ضع رابط سكربت הדبلومة للجروب هنا..."
-                        style="font-size:11px; margin-bottom:15px; border:1px solid rgba(245, 176, 65, 0.4);">
-
+                    <input type="text" id="groupApiInput" placeholder="ضع رابط سكربت الدبلومة للجروب هنا..."
+                        style="font-size:12px; margin-bottom:12px; border:1px solid rgba(247,168,35,0.3);">
                     <button class="btn-submit"
-                        style="background: var(--accent); color:#000; font-size:14px; padding: 10px; margin-top:0;"
+                        style="background:linear-gradient(135deg, var(--accent), #e8920a); color:#000; font-size:14px; padding:12px; margin-top:0; box-shadow:0 6px 18px rgba(247,168,35,0.3);"
                         onclick="saveGroupApi()">حفظ رابط الجروب 🚀</button>
-
                     <button class="btn-submit"
-                        style="background: #ef4444; color:#fff; font-size:14px; padding: 10px; margin-top:10px;"
+                        style="background:linear-gradient(135deg, #ef4444, #dc2626); color:#fff; font-size:14px; padding:12px; margin-top:8px; box-shadow:0 6px 18px rgba(239,68,68,0.25);"
                         onclick="resetGroupApi()">إرجاع الجروب للرابط الافتراضي 🔄</button>
                 </div>
 
-                <div
-                    style="background: rgba(0,0,0,0.1); padding: 20px; border-radius: 16px; margin-bottom: 25px; border: 1px dashed var(--electric-blue);">
-                    <h4 style="margin-top:0; color:var(--electric-blue);">🔗 إعداد الربط الفردي (استعلام الطلاب)</h4>
-                    <p style="font-size: 11px; opacity:0.8; margin-bottom: 15px;">اربط الكود الخاص بكل طالب بالـ API
-                        المنفصل الخاص به (للشيتات الفردية 6 صفوف).</p>
-
+                <div class="settings-card blue">
+                    <h4>🔗 إعداد الربط الفردي (استعلام الطلاب)</h4>
+                    <p>اربط كود كل طالب بالـ API المنفصل الخاص به (للشيتات الفردية 6 صفوف).</p>
                     <div style="display:flex; gap:10px;">
                         <input type="text" id="targetStudentCode" placeholder="مثال: K1EDUR9"
-                            style="flex:1; font-size:12px; margin-bottom:10px; border:1px solid rgba(0, 210, 255, 0.4);">
+                            style="flex:1; font-size:12px; margin-bottom:10px; border:1px solid rgba(0,210,255,0.3);">
                     </div>
                     <input type="text" id="personalApiInput" placeholder="ضع رابط الـ API الفردي هنا..."
-                        style="font-size:11px; margin-bottom:10px; border:1px solid rgba(0, 210, 255, 0.4);">
-
+                        style="font-size:12px; margin-bottom:10px; border:1px solid rgba(0,210,255,0.3);">
                     <button class="btn-submit"
-                        style="background: var(--electric-blue); color:#000; font-size:14px; padding: 10px; margin-top:0;"
+                        style="background:linear-gradient(135deg, var(--electric-blue), #0284c7); color:#000; font-size:14px; padding:12px; margin-top:0; box-shadow:0 6px 18px rgba(0,210,255,0.25);"
                         onclick="savePersonalApi()">ربط الطالب 🔗</button>
 
-                    <div
-                        style="margin-top: 15px; max-height: 150px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 10px; padding: 10px;">
-                        <div
-                            style="font-size:11px; font-weight:bold; color:#fff; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px; margin-bottom:5px;">
-                            قائمة الطلاب المربوطين حالياً:</div>
-                        <div id="mappedLinksMonitor" style="font-size:10px; opacity:0.8; word-break: break-all;">جاري
+                    <div class="links-monitor">
+                        <div class="links-monitor-header">قائمة الطلاب المربوطين حالياً:</div>
+                        <div id="mappedLinksMonitor" style="font-size:11px; opacity:0.8; word-break:break-all;">جاري
                             التحميل...</div>
                     </div>
                 </div>
 
-                <div class="admin-only"
-                    style="background: rgba(0,0,0,0.05); padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);">
-                    <h4 style="margin-top:0; color:var(--text-main);">🎯 إعدادات نهايات الكويز العظمى</h4>
-                    <label style="font-size:13px; font-weight:bold; color:var(--text-muted);">رقم الكويز
-                        المستهدف:</label>
+                <div class="admin-only settings-card subtle">
+                    <h4>🎯 إعدادات نهايات الكويز العظمى</h4>
+                    <label
+                        style="font-size:12px; font-weight:900; color:var(--text-muted); display:block; margin-bottom:8px; letter-spacing:0.5px;">رقم
+                        الكويز المستهدف:</label>
                     <select id="setQNum" onchange="loadSettingMax()">
                         <script>for (let i = 1; i <= 20; i++) document.write(`<option value="${i}">Quiz ${i}</option>`);</script>
                     </select>
-                    <label style="font-size:13px; font-weight:bold; color:var(--text-muted);">درجة النهاية
-                        العظمى:</label>
+                    <label
+                        style="font-size:12px; font-weight:900; color:var(--text-muted); display:block; margin-bottom:8px; letter-spacing:0.5px;">درجة
+                        النهاية العظمى:</label>
                     <input type="number" id="setQMax" placeholder="مثلاً: 15">
-                    <button class="btn-submit" style="background:var(--text-main); color:var(--card-bg);"
+                    <button class="btn-submit"
+                        style="background:linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)); color:var(--text-main); box-shadow:none;"
                         onclick="saveMaxConfig()">تثبيت الدرجة 🔒</button>
                 </div>
             </div>
@@ -1019,91 +1580,61 @@
     <script>
         const CENTRAL_LINKS_API = "https://script.google.com/macros/s/AKfycbxFT_0yMGQMp2tK_F3G_ndN-b5URC-PQOxaT63rLPExzCNyV6p9-UKGpKELVnJbc2LA/exec";
 
-        // Single API for all operations - Grade Sheet handles scan/saveGrade/saveQuiz/saveExtra/getTop
-        let GRADES_API = "https://script.google.com/macros/s/AKfycbx715VQ1MfNK_yLaX6m2rrNaGrJANjIGss9ysM4Sv8z6npcjVJOdnGZZDbJL74-oxDu/exec";
+        let GRADES_API = "https://script.google.com/macros/s/AKfycbyATAge8KOnxJorTSRBKhp01ZNC292S0ScLyUGqyAO8WIJaDbNJi_8htuQhoRNooHrI/exec";
 
-        // 🔗 دالة اختيار الـ API المناسب (الافتراضي أو المخصص للجروب)
         function getEffectiveApi(originalUrl) {
             const currentGroup = localStorage.getItem('userGroup') || "Group A";
             const groupOverride = localStorage.getItem(`GROUP_API_${currentGroup}`);
-            // إذا وجد رابط للجروب، نستخدمه لجميع العمليات بدلاً من الروابط الافتراضية
             return groupOverride || originalUrl;
         }
 
-        // 🔗 دالة جلب رابط الطالب الفردي
         function getPersonalApi(studentCode) {
             let linksMap = JSON.parse(localStorage.getItem('PERSONAL_LINKS_MAP') || '{}');
             return linksMap[studentCode] || localStorage.getItem('PERSONAL_API') || "";
         }
 
         let myChart = null;
-    
-    // Smart caching system for grades
-    const GRADES_CACHE = {
-      leaderboard: { data: null, timestamp: 0, params: '' },
-      search: { data: null, timestamp: 0, code: '' }
-    };
-    const GRADES_CACHE_TTL = 20000; // 20 seconds
-    
-    // Prefetch system for grades - loads data in background
-    const GRADES_PREFETCH = {
-      enabled: true,
-      idleTime: 4000,
-      timeout: null,
-      
-      start: function() {
-        if (!this.enabled || this.timeout) return;
-        this.timeout = setTimeout(() => this.prefetchData(), this.idleTime);
-      },
-      
-      cancel: function() {
-        if (this.timeout) {
-          clearTimeout(this.timeout);
-          this.timeout = null;
-        }
-      },
-      
-      prefetchData: function() {
-        this.enabled = false;
-        
-        const auth = getAuthParams();
-        const group = localStorage.getItem('userGroup') || "Group A";
-        
-        // Fire and forget prefetch for common ranges
-        fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&fromTask=1&toTask=5${auth}`, { method: 'HEAD' })
-          .catch(() => {});
-        fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&fromLec=1&toLec=5${auth}`, { method: 'HEAD' })
-          .catch(() => {});
-      }
-    };
-    
-    // Track activity to trigger prefetch
-    ['click', 'keydown', 'scroll'].forEach(evt => {
-      document.addEventListener(evt, () => GRADES_PREFETCH.start(), { passive: true });
-    });
-    
-    function getGradesCached(key) {
-      const cache = GRADES_CACHE[key];
-      if (cache && cache.data && (Date.now() - cache.timestamp < GRADES_CACHE_TTL)) {
-        return cache.data;
-      }
-      return null;
-    }
-    
-    function setGradesCache(key, data, extra = '') {
-      GRADES_CACHE[key] = { data, timestamp: Date.now(), params: extra };
-    }
-    
-    function clearGradesCache(key) {
-      if (key) {
-        GRADES_CACHE[key] = { data: null, timestamp: 0, params: '' };
-      } else {
-        GRADES_CACHE.leaderboard = { data: null, timestamp: 0, params: '' };
-        GRADES_CACHE.search = { data: null, timestamp: 0, code: '' };
-      }
-    }
 
-        // 🔴 دالة تحويل الأرقام العربية إلى إنجليزية
+        const GRADES_CACHE = {
+            leaderboard: { data: null, timestamp: 0, params: '' },
+            search: { data: null, timestamp: 0, code: '' }
+        };
+        const GRADES_CACHE_TTL = 20000;
+
+        const GRADES_PREFETCH = {
+            enabled: true, idleTime: 4000, timeout: null,
+            start: function () { if (!this.enabled || this.timeout) return; this.timeout = setTimeout(() => this.prefetchData(), this.idleTime); },
+            cancel: function () { if (this.timeout) { clearTimeout(this.timeout); this.timeout = null; } },
+            prefetchData: function () {
+                this.enabled = false;
+                const auth = getAuthParams();
+                fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&fromTask=1&toTask=5${auth}`, { method: 'HEAD' }).catch(() => { });
+                fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&fromLec=1&toLec=5${auth}`, { method: 'HEAD' }).catch(() => { });
+            }
+        };
+
+        ['click', 'keydown', 'scroll'].forEach(evt => {
+            document.addEventListener(evt, () => GRADES_PREFETCH.start(), { passive: true });
+        });
+
+        function getGradesCached(key) {
+            const cache = GRADES_CACHE[key];
+            if (cache && cache.data && (Date.now() - cache.timestamp < GRADES_CACHE_TTL)) return cache.data;
+            return null;
+        }
+
+        function setGradesCache(key, data, extra = '') {
+            GRADES_CACHE[key] = { data, timestamp: Date.now(), params: extra };
+        }
+
+        function clearGradesCache(key) {
+            if (key) { GRADES_CACHE[key] = { data: null, timestamp: 0, params: '' }; }
+            else {
+                GRADES_CACHE.leaderboard = { data: null, timestamp: 0, params: '' };
+                GRADES_CACHE.search = { data: null, timestamp: 0, code: '' };
+            }
+        }
+
         function convertNumerals(str) {
             const arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
             return str.replace(/[٠-٩]/g, w => arabicNumbers.indexOf(w));
@@ -1111,7 +1642,10 @@
 
         window.onload = () => {
             if (localStorage.getItem('isLoggedIn') !== 'true') { window.location.href = 'index.html'; return; }
-            if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark-mode');
+            const savedDark = localStorage.getItem('darkMode') === 'true';
+            if (savedDark) document.body.classList.add('dark-mode');
+            const themeBtn = document.getElementById('themeToggle');
+            if (themeBtn) themeBtn.innerText = savedDark ? '🌙' : '☀️';
 
             const rawRole = localStorage.getItem('userRole') || "CADRE";
             const role = rawRole.toUpperCase();
@@ -1120,24 +1654,29 @@
             document.getElementById('welcomeName').innerText = `| ${name}`;
             document.getElementById('sideRole').innerText = rawRole;
 
+            const rBadge = document.getElementById('roleBadge');
+            if (rBadge) {
+                rBadge.innerText = (role === 'OWNER') ? 'المالك 👑' : (role === 'CO-FOUNDER') ? 'CO-Founder 🌟' : (role === 'TEAM MANAGER' || role === 'ADMIN') ? 'Team Manager' : (role === 'CADRE LEADER') ? 'Cadre Leader 🌟' : (role === 'COORDINATOR' || role === 'MANAGER') ? 'Coordinator' : 'Cadre';
+                rBadge.style.display = 'inline-flex';
+            }
+
             const groupVal = localStorage.getItem('userGroup') || "Group A";
             document.getElementById('groupBadge').innerText = groupVal;
-            document.getElementById('groupBadge').style.display = "inline-block";
+            document.getElementById('groupBadge').style.display = "inline-flex";
 
             if (role === 'OWNER') document.body.classList.add('role-owner');
             else if (role === 'CO-FOUNDER') document.body.classList.add('role-co-founder');
             else if (role === 'TEAM MANAGER' || role === 'ADMIN') document.body.classList.add('role-admin');
+            else if (role === 'CADRE LEADER') document.body.classList.add('role-cadre-leader');
             else if (role === 'COORDINATOR' || role === 'MANAGER') document.body.classList.add('role-manager');
             else document.body.classList.add('role-user');
 
             fillGroupSelects();
             loadLinksDatabase();
 
-            // 🚀 Background Prefetch: sılently load data so views are instant
             setTimeout(() => prefetchGroupData(), 2000);
         };
 
-        // Cache storage for prefetched data
         let _prefetchCache = {};
         let _prefetchDone = false;
 
@@ -1154,116 +1693,99 @@
                 _prefetchCache = { tasks: rTasks, quizzes: rQuizzes, attendance: rAttend, extras: rExtra, params: `fl=${fl}&tl=${tl}` };
                 _prefetchDone = true;
                 console.log("✅ Background prefetch complete");
-            } catch (e) {
-                console.log("Prefetch skipped:", e);
-            }
+            } catch (e) { console.log("Prefetch skipped:", e); }
         }
 
         function loadLinksDatabase() {
-            fetch(`${CENTRAL_LINKS_API}?action=getAllLinks`)
-                .then(r => r.json())
-                .then(data => {
-                    if (data.status === "success") {
-                        // Update Groups Cache
-                        for (let g in data.groups) {
-                            localStorage.setItem(`GROUP_API_${g}`, data.groups[g]);
-                        }
-                        // Update Individuals Cache
-                        localStorage.setItem('PERSONAL_LINKS_MAP', JSON.stringify(data.individuals));
-
-                        // refresh UI if on settings view
-                        if (document.getElementById('groupApiInput')) {
-                            const currentGroup = localStorage.getItem('userGroup') || "Group A";
-                            document.getElementById('groupApiInput').value = localStorage.getItem(`GROUP_API_${currentGroup}`) || "";
-                        }
-                        refreshLinksMonitor();
+            fetch(`${CENTRAL_LINKS_API}?action=getAllLinks`).then(r => r.json()).then(data => {
+                if (data.status === "success") {
+                    for (let g in data.groups) localStorage.setItem(`GROUP_API_${g}`, data.groups[g]);
+                    localStorage.setItem('PERSONAL_LINKS_MAP', JSON.stringify(data.individuals));
+                    if (document.getElementById('groupApiInput')) {
+                        const currentGroup = localStorage.getItem('userGroup') || "Group A";
+                        document.getElementById('groupApiInput').value = localStorage.getItem(`GROUP_API_${currentGroup}`) || "";
                     }
-                }).catch(e => console.error("Error loading links DB", e));
+                    refreshLinksMonitor();
+                }
+            }).catch(e => console.error("Error loading links DB", e));
         }
 
         function saveGroupApi() {
             const url = document.getElementById('groupApiInput').value.trim();
             const currentGroup = localStorage.getItem('userGroup') || "Group A";
-            if (!url) return showToast("❌ יرجى إدخال الرابط أولاً", "error");
-
+            if (!url) return showToast("❌ يرجى إدخال الرابط أولاً", "error");
             showToast("⏳ جاري الحفظ في الـ Database المركزية...", "info");
-            fetch(`${CENTRAL_LINKS_API}?action=saveGroup&group=${encodeURIComponent(currentGroup)}&url=${encodeURIComponent(url)}`)
-                .then(r => r.json())
-                .then(res => {
-                    localStorage.setItem(`GROUP_API_${currentGroup}`, url);
-                    showToast(`✅ تم حفظ رابط الجروب لـ ${currentGroup}! 🚀`, "success");
-                }).catch(e => showToast("❌ خطأ في الاتصال بالشبكة", "error"));
+            fetch(`${CENTRAL_LINKS_API}?action=saveGroup&group=${encodeURIComponent(currentGroup)}&url=${encodeURIComponent(url)}`).then(r => r.json()).then(res => {
+                localStorage.setItem(`GROUP_API_${currentGroup}`, url);
+                showToast(`✅ تم حفظ رابط الجروب لـ ${currentGroup}! 🚀`, "success");
+            }).catch(e => showToast("❌ خطأ في الاتصال بالشبكة", "error"));
         }
 
         function resetGroupApi() {
             const currentGroup = localStorage.getItem('userGroup') || "Group A";
             showToast("⏳ جاري الحذف من الـ Database...", "info");
-            fetch(`${CENTRAL_LINKS_API}?action=removeGroup&group=${encodeURIComponent(currentGroup)}`)
-                .then(r => r.json())
-                .then(res => {
-                    localStorage.removeItem(`GROUP_API_${currentGroup}`);
-                    document.getElementById('groupApiInput').value = "";
-                    showToast(`🔄 تم إرجاع ${currentGroup} للرابط الافتراضي`, "success");
-                }).catch(e => showToast("❌ خطأ في الاتصال بالشبكة", "error"));
+            fetch(`${CENTRAL_LINKS_API}?action=removeGroup&group=${encodeURIComponent(currentGroup)}`).then(r => r.json()).then(res => {
+                localStorage.removeItem(`GROUP_API_${currentGroup}`);
+                document.getElementById('groupApiInput').value = "";
+                showToast(`🔄 تم إرجاع ${currentGroup} للرابط الافتراضي`, "success");
+            }).catch(e => showToast("❌ خطأ في الاتصال بالشبكة", "error"));
         }
 
         function savePersonalApi() {
             const url = document.getElementById('personalApiInput').value.trim();
             let code = document.getElementById('targetStudentCode').value.trim().toUpperCase();
             const currentGroup = localStorage.getItem('userGroup') || "Group A";
-
             if (!code || !url) return showToast("❌ يرجى إدخال الكود والرابط معاً", "error");
-            // If they just typed "K1", append standard suffix
             if (!code.includes("EDUR")) code = code + "EDUR9";
-
+            const groupLetter = currentGroup.replace("Group ", "").trim();
+            if (!code.startsWith(groupLetter)) return showToast("❌ لا تملك صلاحية التعديل على جروب آخر!", "error");
             showToast("⏳ جاري الحفظ في الـ Database المركزية...", "info");
-            fetch(`${CENTRAL_LINKS_API}?action=saveIndividual&code=${encodeURIComponent(code)}&url=${encodeURIComponent(url)}&group=${encodeURIComponent(currentGroup)}`)
-                .then(r => r.json())
-                .then(res => {
-                    let linksMap = JSON.parse(localStorage.getItem('PERSONAL_LINKS_MAP') || '{}');
-                    linksMap[code] = url;
-                    localStorage.setItem('PERSONAL_LINKS_MAP', JSON.stringify(linksMap));
-
-                    showToast(`✅ تم بنجاح ربط الطالب ${code} 🔗`, "success");
-                    document.getElementById('targetStudentCode').value = "";
-                    document.getElementById('personalApiInput').value = "";
-                    refreshLinksMonitor();
-                }).catch(e => showToast("❌ خطأ في الاتصال", "error"));
+            fetch(`${CENTRAL_LINKS_API}?action=saveIndividual&code=${encodeURIComponent(code)}&url=${encodeURIComponent(url)}&group=${encodeURIComponent(currentGroup)}`).then(r => r.json()).then(res => {
+                let linksMap = JSON.parse(localStorage.getItem('PERSONAL_LINKS_MAP') || '{}');
+                linksMap[code] = url;
+                localStorage.setItem('PERSONAL_LINKS_MAP', JSON.stringify(linksMap));
+                showToast(`✅ تم بنجاح ربط الطالب ${code} 🔗`, "success");
+                document.getElementById('targetStudentCode').value = "";
+                document.getElementById('personalApiInput').value = "";
+                refreshLinksMonitor();
+            }).catch(e => showToast("❌ خطأ في الاتصال", "error"));
         }
 
         function refreshLinksMonitor() {
             const monitor = document.getElementById('mappedLinksMonitor');
             if (!monitor) return;
             let linksMap = JSON.parse(localStorage.getItem('PERSONAL_LINKS_MAP') || '{}');
-
+            const currentGroup = localStorage.getItem('userGroup') || "Group A";
+            const groupLetter = currentGroup.replace("Group ", "").trim();
             let html = "";
             for (let code in linksMap) {
+                if (!code.startsWith(groupLetter)) continue;
                 html += `<div style="border-bottom:1px solid rgba(255,255,255,0.05); padding:4px 0; margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;">
-                            <span style="color:var(--electric-blue); font-weight:bold;">${code}</span>
-                            <span style="opacity:0.6; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:60%; margin:0 10px;">${linksMap[code]}</span>
-                            <button onclick="removePersonalLink('${code}')" style="background:none; border:none; color:#ef4444; cursor:pointer;" title="حذف">🗑️</button>
-                         </div>`;
+                  <span style="color:var(--electric-blue); font-weight:bold; font-size:12px;">${code}</span>
+                  <span style="opacity:0.5; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:55%; margin:0 8px; font-size:10px;">${linksMap[code]}</span>
+                  <button onclick="removePersonalLink('${code}')" style="background:none; border:none; color:#ef4444; cursor:pointer; padding:2px 6px; font-size:14px;" title="حذف">🗑️</button>
+               </div>`;
             }
-            monitor.innerHTML = html || "<div style='text-align:center; opacity:0.5;'>لا يوجد روابط مسجلة حالياً...</div>";
+            monitor.innerHTML = html || "<div style='text-align:center; opacity:0.4; font-size:12px; padding:8px;'>لا يوجد روابط مسجلة حالياً لهذا الجروب...</div>";
         }
 
         function removePersonalLink(code) {
+            const currentGroup = localStorage.getItem('userGroup') || "Group A";
+            const groupLetter = currentGroup.replace("Group ", "").trim();
+            if (!code.startsWith(groupLetter)) return showToast("❌ غير مصرح لك بحذف كود من جروب آخر!", "error");
             showToast("⏳ جاري الحذف من الـ Database...", "info");
-            fetch(`${CENTRAL_LINKS_API}?action=removeIndividual&code=${encodeURIComponent(code)}`)
-                .then(r => r.json())
-                .then(res => {
-                    let linksMap = JSON.parse(localStorage.getItem('PERSONAL_LINKS_MAP') || '{}');
-                    delete linksMap[code];
-                    localStorage.setItem('PERSONAL_LINKS_MAP', JSON.stringify(linksMap));
-                    refreshLinksMonitor();
-                    showToast("🗑️ تم حذف الربط بنجاح", "success");
-                }).catch(e => showToast("❌ خطأ في الاتصال", "error"));
+            fetch(`${CENTRAL_LINKS_API}?action=removeIndividual&code=${encodeURIComponent(code)}`).then(r => r.json()).then(res => {
+                let linksMap = JSON.parse(localStorage.getItem('PERSONAL_LINKS_MAP') || '{}');
+                delete linksMap[code];
+                localStorage.setItem('PERSONAL_LINKS_MAP', JSON.stringify(linksMap));
+                refreshLinksMonitor();
+                showToast("🗑️ تم حذف الربط بنجاح", "success");
+            }).catch(e => showToast("❌ خطأ في الاتصال", "error"));
         }
 
         function switchView(viewId) {
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
-
             document.getElementById(`view-${viewId}`).classList.add('active');
             const navItem = document.getElementById(`nav-${viewId}`);
             if (navItem) navItem.classList.add('active');
@@ -1271,29 +1793,25 @@
 
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
-            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
-            if (myChart) extractTop5();
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+            const btn = document.getElementById('themeToggle');
+            if (btn) btn.innerText = isDark ? '🌙' : '☀️';
+            if (myChart) extractLeaderboard();
         }
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('show'); }
+
         function logout() {
-            // مسح بيانات الجلسة فقط والحفاظ على الإعدادات
             const keysToKeep = ['darkMode', 'PERSONAL_LINKS_MAP', 'PERSONAL_API'];
-            // نحتفظ أيضاً بروابط الجروبات
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
-                if (key.startsWith('GROUP_API_')) keysToKeep.push(key);
+                if (key && key.startsWith('GROUP_API_')) keysToKeep.push(key);
             }
-
             const backup = {};
             keysToKeep.forEach(k => backup[k] = localStorage.getItem(k));
-
             localStorage.clear();
-
-            Object.keys(backup).forEach(k => {
-                if (backup[k] !== null) localStorage.setItem(k, backup[k]);
-            });
-
+            Object.keys(backup).forEach(k => { if (backup[k] !== null) localStorage.setItem(k, backup[k]); });
             window.location.href = 'index.html';
         }
 
@@ -1306,11 +1824,13 @@
 
         function changeGlobalGroup(val) {
             localStorage.setItem('userGroup', val);
-            document.getElementById('groupBadge').innerText = val;
-
-            // Refresh API input field for new group selection
-            if (document.getElementById('groupApiInput')) {
-                document.getElementById('groupApiInput').value = localStorage.getItem(`GROUP_API_${val}`) || "";
+            const groupBadge = document.getElementById('groupBadge');
+            if (groupBadge) groupBadge.innerText = val;
+            if (document.getElementById('groupApiInput')) document.getElementById('groupApiInput').value = localStorage.getItem(`GROUP_API_${val}`) || "";
+            const activeTab = document.querySelector('.view-section.active');
+            if (activeTab) {
+                if (activeTab.id === 'view-settings') { if (typeof loadLinksDatabase === 'function') loadLinksDatabase(); if (typeof refreshLinksMonitor === 'function') refreshLinksMonitor(); }
+                else if (activeTab.id === 'view-topView') { if (typeof extractLeaderboard === 'function') extractLeaderboard(false); }
             }
         }
 
@@ -1337,11 +1857,10 @@
             return `&email=${encodeURIComponent(localStorage.getItem('userEmail'))}&token=${encodeURIComponent(localStorage.getItem('sessionToken'))}&group=${encodeURIComponent(localStorage.getItem('userGroup'))}`;
         }
 
-let _isSubmitting = false;
+        let _isSubmitting = false;
 
         function submitData() {
             if (_isSubmitting) return;
-            
             let numRaw = document.getElementById('studentCode').value.trim();
             if (!numRaw) return showToast("❌ برجاء إدخال رقم كود الطالب", "error");
 
@@ -1350,32 +1869,27 @@ let _isSubmitting = false;
             const code = groupLetter + num + "EDUR9";
             const lec = document.getElementById('currentLecNum').value;
             const auth = getAuthParams();
-            
+
             _isSubmitting = true;
 
-            // Use single central API endpoint
             const centralApi = getEffectiveApi(GRADES_API);
             let promises = [];
             let taskName = "TASK " + lec;
-            
-            // 1. Save Attendance (scan) - Central
+
             if (document.getElementById('attBtn').classList.contains('active-att')) {
                 promises.push(fetch(`${centralApi}?action=scan&qrCode=${code}&lectureNum=${lec}&weight=15${auth}`).then(r => r.json()).catch(e => ({})));
             }
 
-            // 2. Save Main Task Grade - Central
             let taskVal = convertNumerals(document.getElementById('valTask').value);
             if (taskVal) {
                 promises.push(fetch(`${centralApi}?action=saveGrade&qrCode=${code}&taskNum=${lec}&val=${taskVal}${auth}`).then(r => r.json()).catch(e => ({})));
             }
 
-            // 3. Save Quiz Grade - Central  
             let quizVal = convertNumerals(document.getElementById('valQuiz').value);
             if (quizVal) {
                 promises.push(fetch(`${centralApi}?action=saveQuiz&qrCode=${code}&quizNum=${lec}&val=${quizVal}${auth}`).then(r => r.json()).catch(e => ({})));
             }
 
-            // 4. Save Extra (feedback, attitude, bonus) - Central
             let f = document.getElementById('feedBtn').classList.contains('active-feed') ? 1 : 0;
             let a = document.getElementById('attitBtn').classList.contains('active-attit') ? 5 : 0;
             let b = convertNumerals(document.getElementById('valBonus').value) || 0;
@@ -1384,95 +1898,49 @@ let _isSubmitting = false;
                 promises.push(fetch(`${centralApi}?action=saveExtra&qrCode=${code}&lectureNum=${lec}&feedback=${f}&attitude=${a}&bonus=${b}${auth}`).then(r => r.json()).catch(e => ({})));
             }
 
-            // === SYNC to Individual Student Sheet ===
             let personalApi = getPersonalApi(code);
             if (personalApi) {
-                console.log("Syncing to personal sheet:", personalApi);
-                
-                // Attendance
                 if (document.getElementById('attBtn').classList.contains('active-att')) {
-                    promises.push(
-                        fetch(`${personalApi}?action=update&qrCode=${code}&taskName=${encodeURIComponent(taskName)}&category=${encodeURIComponent('attendance .15')}&val=15`)
-                        .then(r => r.json()).then(res => console.log("Sync Attendance:", res)).catch(e => console.error("Sync Error:", e))
-                    );
+                    promises.push(fetch(`${personalApi}?action=update&qrCode=${code}&taskName=${encodeURIComponent(taskName)}&category=${encodeURIComponent('attendance .15')}&val=15`).then(r => r.json()).then(res => console.log("Sync Attendance:", res)).catch(e => console.error("Sync Error:", e)));
                 }
-                
-                // Main Task
                 if (taskVal) {
-                    promises.push(
-                        fetch(`${personalApi}?action=update&qrCode=${code}&taskName=${encodeURIComponent(taskName)}&category=${encodeURIComponent('Main task. 70')}&val=${taskVal}`)
-                        .then(r => r.json()).then(res => console.log("Sync Task:", res)).catch(e => console.error("Sync Error:", e))
-                    );
+                    promises.push(fetch(`${personalApi}?action=update&qrCode=${code}&taskName=${encodeURIComponent(taskName)}&category=${encodeURIComponent('Main task. 70')}&val=${taskVal}`).then(r => r.json()).then(res => console.log("Sync Task:", res)).catch(e => console.error("Sync Error:", e)));
                 }
-                
-                // Quiz
                 if (quizVal) {
-                    promises.push(
-                        fetch(`${personalApi}?action=update&qrCode=${code}&taskName=${encodeURIComponent(taskName)}&category=${encodeURIComponent('online quize 25')}&val=${quizVal}`)
-                        .then(r => r.json()).then(res => console.log("Sync Quiz:", res)).catch(e => console.error("Sync Error:", e))
-                    );
+                    promises.push(fetch(`${personalApi}?action=update&qrCode=${code}&taskName=${encodeURIComponent(taskName)}&category=${encodeURIComponent('online quize 25')}&val=${quizVal}`).then(r => r.json()).then(res => console.log("Sync Quiz:", res)).catch(e => console.error("Sync Error:", e)));
                 }
-                
-                // Extra (attitude + feedback)
                 let combinedAtt = 0;
-                if (f) combinedAtt += 5;  // feedback = 5
-                if (a) combinedAtt += 5;  // attitude = 5
-                
+                if (f) combinedAtt += 5;
+                if (a) combinedAtt += 5;
                 if (combinedAtt > 0) {
-                    promises.push(
-                        fetch(`${personalApi}?action=update&qrCode=${code}&taskName=${encodeURIComponent(taskName)}&category=${encodeURIComponent('attitude .10')}&val=${combinedAtt}`)
-                        .then(r => r.json()).then(res => console.log("Sync Attitude:", res)).catch(e => console.error("Sync Error:", e))
-                    );
+                    promises.push(fetch(`${personalApi}?action=update&qrCode=${code}&taskName=${encodeURIComponent(taskName)}&category=${encodeURIComponent('attendance .10')}&val=${combinedAtt}`).then(r => r.json()).catch(e => console.error("Sync Error:", e)));
                 }
-                
-                // Bonus
-                if (b) {
-                    promises.push(
-                        fetch(`${personalApi}?action=update&qrCode=${code}&taskName=${encodeURIComponent(taskName)}&category=${encodeURIComponent('bonus')}&val=${b}`)
-                        .then(r => r.json()).then(res => console.log("Sync Bonus:", res)).catch(e => console.error("Sync Error:", e))
-                    );
-                }
-            } else {
-                console.log("No personal API found for:", code);
             }
 
-            if (promises.length === 0) {
-                _isSubmitting = false;
-                return showToast("⚠️ لم يتم إدخال أي تقييم لإرساله!", "error");
-            }
-
-            _isSubmitting = false;
-
-            // Auto-clear for quick continuous entry
-            document.getElementById('studentCode').value = "";
-            document.getElementById('valTask').value = "";
-            document.getElementById('valQuiz').value = "";
-            document.getElementById('valBonus').value = "";
-            document.getElementById('attBtn').classList.remove('active-att');
-            document.getElementById('feedBtn').classList.remove('active-feed');
-            document.getElementById('attitBtn').classList.remove('active-attit');
-            document.getElementById('studentCode').focus();
-
-            showToast("⏳ جاري التسجيل...", "success");
+            showLoader(true, "جاري حفظ التقييم وإرسال البيانات 📡...");
 
             Promise.all(promises).then(results => {
-                let studentName = "";
-                for (let res of results) {
-                    if (!res) continue;
-                    if (res.name) { studentName = res.name; break; }
-                    if (res.studentName) { studentName = res.studentName; break; }
-                    if (res.message && res.message.includes("الطالب")) {
-                        let parts = res.message.split("الطالب");
-                        if (parts.length > 1) { studentName = parts[1].replace(':', '').trim(); break; }
-                    }
-                    if (res.message && res.message.includes("-")) {
-                        let parts = res.message.split("-");
-                        if (parts.length > 1) { studentName = parts[1].trim(); break; }
-                    }
-                }
+                showLoader(false);
+                _isSubmitting = false;
+                clearGradesCache('leaderboard');
+                clearGradesCache('search');
+
+                let studentName = null;
+                results.forEach(res => { if (res && res.name) studentName = res.name; });
+
+                document.getElementById('studentCode').value = '';
+                document.getElementById('valBonus').value = '';
+                document.getElementById('valTask').value = '';
+                document.getElementById('valQuiz').value = '';
+                document.getElementById('attBtn').classList.remove('active-att');
+                document.getElementById('feedBtn').classList.remove('active-feed');
+                document.getElementById('attitBtn').classList.remove('active-attit');
+
                 let displayName = studentName || (groupLetter + num);
                 showToast("✅ تم التوثيق بنجاح لـ: " + displayName, "success");
             }).catch(e => {
+                showLoader(false);
+                _isSubmitting = false;
                 showToast("❌ حدث خطأ في بعض ملفات التقييم", "error");
             });
         }
@@ -1491,16 +1959,10 @@ let _isSubmitting = false;
             showLoader(true, "جاري استرجاع سجلات الطالب 🔍...");
             try {
                 const auth = getAuthParams();
-                
-                // Fetch each category separately with correct parameters
                 const [rAttend, rTasks, rQuizzes, rExtra] = await Promise.all([
-                    // Attendance: uses fromLec/toLec (no task or quiz params)
                     fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&fromLec=${fl}&toLec=${tl}&weight=15${auth}`).then(r => r.json()),
-                    // Main Tasks: uses fromTask/toTask
                     fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&fromTask=${fl}&toTask=${tl}${auth}`).then(r => r.json()),
-                    // Quizzes: uses fromQuiz/toQuiz  
                     fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&fromQuiz=${fl}&toQuiz=${tl}${auth}`).then(r => r.json()),
-                    // Extra (feedback + attitude + bonus): uses extraOnly
                     fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&extraOnly=1&fromLec=${fl}&toLec=${tl}${auth}`).then(r => r.json())
                 ]);
 
@@ -1508,14 +1970,12 @@ let _isSubmitting = false;
                 const addRow = (res, label) => {
                     let s = (res.scores || []).find(x => x.id === code);
                     let val = (s && !isNaN(parseFloat(s.total))) ? parseFloat(s.total) : 0;
-                    html += `<tr><td>${label}</td><td><span style="color:var(--electric-blue); font-size:1.1rem;">${val}</span></td></tr>`;
+                    html += `<tr><td>${label}</td><td><span style="color:var(--electric-blue); font-size:1.1rem; font-weight:900;">${val}</span></td></tr>`;
                     total += val;
                     if (s && s.name) document.getElementById('resName').innerText = s.name;
                 };
 
                 document.getElementById('resName').innerText = "لم يتم العثور على اسم";
-                
-                // Each API returns its own category data
                 addRow(rAttend, "إجمالي الحضور");
                 addRow(rTasks, "إجمالي التاسكات");
                 addRow(rQuizzes, "إجمالي الكويزات");
@@ -1526,10 +1986,10 @@ let _isSubmitting = false;
                 document.getElementById('resTotal').innerText = total;
                 showLoader(false);
 
-            } catch (e) { 
+            } catch (e) {
                 console.error(e);
-                showLoader(false); 
-                showToast("❌ خطأ في جلب البيانات", "error"); 
+                showLoader(false);
+                showToast("❌ خطأ في جلب البيانات", "error");
             }
         }
 
@@ -1538,7 +1998,6 @@ let _isSubmitting = false;
             let fl = document.getElementById('fL').value, tl = document.getElementById('tL').value;
             if (parseInt(fl) > parseInt(tl)) return showToast("❌ نطاق المحاضرات غير صحيح", "error");
 
-            // Check cache first
             const cacheParams = `fl=${fl}&tl=${tl}`;
             if (useCache) {
                 const cached = getGradesCached('leaderboard');
@@ -1557,8 +2016,6 @@ let _isSubmitting = false;
             showLoader(true, "جاري تحليل بيانات الجروب لاستخراج الترتيب 🏆...");
             try {
                 const auth = getAuthParams();
-
-                // Fetch each category separately
                 const [rTasks, rQuizzes, rAttend, rExtra] = await Promise.all([
                     fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&fromTask=${fl}&toTask=${tl}${auth}`).then(r => r.json()),
                     fetch(`${getEffectiveApi(GRADES_API)}?action=getTop&fromQuiz=${fl}&toQuiz=${tl}${auth}`).then(r => r.json()),
@@ -1567,7 +2024,7 @@ let _isSubmitting = false;
                 ]);
 
                 let m = {};
-                const col = (d, weight = 1) => {
+                const col = (d) => {
                     if (d.status === 'success') {
                         d.scores.forEach(s => {
                             let val = parseFloat(s.total);
@@ -1587,7 +2044,7 @@ let _isSubmitting = false;
                 showLoader(false);
 
                 if (fullLeaderboard.length === 0) {
-                    document.getElementById('leaderboard').innerHTML = "<div style='text-align:center; padding:20px; color:var(--text-muted); font-weight:bold;'>لا توجد بيانات كافية لعرض الترتيب</div>";
+                    document.getElementById('leaderboard').innerHTML = "<div style='text-align:center; padding:24px; color:var(--text-muted); font-weight:800;'>لا توجد بيانات كافية لعرض الترتيب</div>";
                     document.getElementById('chartWrapper').style.display = 'none';
                     return;
                 }
@@ -1596,31 +2053,29 @@ let _isSubmitting = false;
                 document.getElementById('chartWrapper').style.display = 'block';
                 let top5 = fullLeaderboard.slice(0, 5);
                 renderChart(top5.map(x => (x.n || "").split(" ")[0]), top5.map(x => x.t));
-                
-                // Save to cache
                 setGradesCache('leaderboard', fullLeaderboard, cacheParams);
 
-            } catch (e) { 
+            } catch (e) {
                 console.error(e);
-                showLoader(false); 
-                showToast("❌ فشل استخراج الترتيب", "error"); 
+                showLoader(false);
+                showToast("❌ فشل استخراج الترتيب", "error");
             }
         }
 
         function renderLeaderboard(dataArray) {
             let listHtml = "";
             if (dataArray.length === 0) {
-                document.getElementById('leaderboard').innerHTML = "<div style='text-align:center; padding:20px;'>لا توجد نتائج متطابقة للبحث</div>"; return;
+                document.getElementById('leaderboard').innerHTML = "<div style='text-align:center; padding:24px; color:var(--text-muted);'>لا توجد نتائج متطابقة للبحث</div>"; return;
             }
             dataArray.forEach(s => {
                 let rankClass = s.rank <= 3 ? `rank-${s.rank}` : `rank-other`;
                 let rankIcon = s.rank === 1 ? "🥇" : s.rank === 2 ? "🥈" : s.rank === 3 ? "🥉" : `#${s.rank}`;
                 listHtml += `
-            <div class="leader-card ${rankClass}">
-                <div class="leader-rank">${rankIcon}</div>
-                <div class="leader-name" style="flex:1; padding-right:15px; text-align:right;">${s.n} <br><span style="font-size:11px; color:var(--text-muted); font-family:monospace;">${s.id}</span></div>
-                <div class="leader-score">${s.t} Pt</div>
-            </div>`;
+        <div class="leader-card ${rankClass}">
+          <div class="leader-rank">${rankIcon}</div>
+          <div class="leader-name" style="flex:1; padding-right:14px; text-align:right;">${s.n}<br><span style="font-size:11px; color:var(--text-muted); font-family:monospace;">${s.id}</span></div>
+          <div class="leader-score">${s.t} Pt</div>
+        </div>`;
             });
             document.getElementById('leaderboard').innerHTML = listHtml;
         }
@@ -1636,16 +2091,211 @@ let _isSubmitting = false;
             const isDark = document.body.classList.contains('dark-mode');
             const barColor = isDark ? '#00d2ff' : '#0f172a';
             const textColor = isDark ? '#cbd5e1' : '#64748b';
-
             myChart = new Chart(ctx, {
                 type: 'bar',
-                data: { labels, datasets: [{ label: 'إجمالي النقاط', data, backgroundColor: ['#FFD700', '#C0C0C0', '#CD7F32', barColor, barColor], borderRadius: 8 }] },
+                data: { labels, datasets: [{ label: 'إجمالي النقاط', data, backgroundColor: ['#FFD700', '#C0C0C0', '#CD7F32', barColor, barColor], borderRadius: 10 }] },
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { color: textColor } }, x: { ticks: { color: textColor, font: { family: 'Cairo', weight: 'bold' } } } }, plugins: { legend: { display: false } } }
             });
         }
 
         function loadSettingMax() { }
         function saveMaxConfig() { showToast("✅ تم حفظ الإعدادات بنجاح"); }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof particlesJS !== 'undefined') {
+                particlesJS('particles-js', {
+                    "particles": {
+                        "number": { "value": 120, "density": { "enable": true, "value_area": 1200 } },
+                        "color": { "value": ["#F7A823", "#00d2ff", "#ffffff", "#F7A823"] },
+                        "shape": { "type": "circle" },
+                        "opacity": {
+                            "value": 0.5,
+                            "random": true,
+                            "anim": { "enable": true, "speed": 0.8, "opacity_min": 0.05, "sync": false }
+                        },
+                        "size": {
+                            "value": 3,
+                            "random": true,
+                            "anim": { "enable": true, "speed": 1.5, "size_min": 0.5, "sync": false }
+                        },
+                        "line_linked": {
+                            "enable": true,
+                            "distance": 160,
+                            "color": "#F7A823",
+                            "opacity": 0.12,
+                            "width": 1
+                        },
+                        "move": {
+                            "enable": true,
+                            "speed": 0.6,
+                            "direction": "top",
+                            "random": true,
+                            "straight": false,
+                            "out_mode": "out",
+                            "bounce": false,
+                            "attract": { "enable": true, "rotateX": 3000, "rotateY": 3000 }
+                        }
+                    },
+                    "interactivity": {
+                        "detect_on": "window",
+                        "events": {
+                            "onhover": { "enable": true, "mode": "bubble" },
+                            "onclick": { "enable": true, "mode": "push" },
+                            "resize": true
+                        },
+                        "modes": {
+                            "bubble": { "distance": 200, "size": 6, "duration": 2, "opacity": 0.8, "speed": 3 },
+                            "push": { "particles_nb": 4 }
+                        }
+                    },
+                    "retina_detect": true
+                });
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.matchMedia("(pointer: fine)").matches) {
+                const cursorGlow = document.createElement('div');
+                cursorGlow.classList.add('cursor-glow');
+                document.body.appendChild(cursorGlow);
+
+                let mouseX = -100, mouseY = -100;
+                let cursorX = -100, cursorY = -100;
+
+                document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+
+                function animateCursor() {
+                    cursorX += (mouseX - cursorX) * 0.15;
+                    cursorY += (mouseY - cursorY) * 0.15;
+                    cursorGlow.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
+                    requestAnimationFrame(animateCursor);
+                }
+                animateCursor();
+
+                const addHoverListeners = () => {
+                    document.querySelectorAll('button, a, input, select, .glass-panel, .dashboard-card').forEach(el => {
+                        if (!el.dataset.hasCursorHover) {
+                            el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+                            el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+                            el.dataset.hasCursorHover = "true";
+                        }
+                    });
+                };
+                addHoverListeners();
+                setInterval(addHoverListeners, 2000);
+            }
+        });
+    </script>
+
+    <!-- Atom Background Animation (Smooth) -->
+    <script>
+    (function initAtoms() {
+      const canvas = document.createElement('canvas');
+      canvas.id = 'atom-canvas';
+      document.body.insertBefore(canvas, document.body.firstChild);
+      const ctx = canvas.getContext('2d');
+
+      let W, H;
+      const resize = () => { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; };
+      resize();
+      window.addEventListener('resize', resize);
+
+      const TRAIL = 20;
+      const ATOM_COUNT = 7;
+      const atoms = Array.from({ length: ATOM_COUNT }, () => ({
+        x: 0.1 + Math.random() * 0.8,
+        y: 0.1 + Math.random() * 0.8,
+        radius: 30 + Math.random() * 38,
+        orbits: [
+          { tilt: Math.random() * Math.PI,       speed:  0.20 + Math.random() * 0.15, angle: Math.random() * Math.PI * 2, eRad: 4 + Math.random() * 2, color: 0, trail: [] },
+          { tilt: Math.random() * Math.PI + 0.9, speed: -(0.15 + Math.random() * 0.18), angle: Math.random() * Math.PI * 2, eRad: 3 + Math.random() * 2, color: 1, trail: [] },
+          { tilt: Math.random() * Math.PI + 1.6, speed:  0.22 + Math.random() * 0.13, angle: Math.random() * Math.PI * 2, eRad: 3.5 + Math.random() * 2, color: 2, trail: [] },
+        ],
+        drift: { vx: (Math.random() - 0.5) * 0.00007, vy: (Math.random() - 0.5) * 0.00007 },
+        nucleusPulse: Math.random() * Math.PI * 2,
+      }));
+
+      function isDark() { return document.body.classList.contains('dark-mode'); }
+
+      function ePos(atom, orb) {
+        const r = atom.radius, cx = atom.x * W, cy = atom.y * H;
+        const cosT = Math.cos(orb.tilt), sinT = Math.sin(orb.tilt);
+        const ex0 = r * Math.cos(orb.angle), ey0 = r * 0.40 * Math.sin(orb.angle);
+        return { x: cx + ex0 * cosT - ey0 * sinT, y: cy + ex0 * sinT + ey0 * cosT };
+      }
+
+      function drawAtom(atom, t, dark) {
+        const cx = atom.x * W, cy = atom.y * H, r = atom.radius;
+        const C = dark
+          ? ['rgba(247,168,35,', 'rgba(0,210,255,', 'rgba(255,220,80,']
+          : ['rgba(180,90,0,',   'rgba(0,120,180,', 'rgba(80,60,180,'];
+        const oA = dark ? 0.13 : 0.18;
+        const eA = dark ? 0.95 : 0.88;
+        const nA = dark ? 0.50 : 0.40;
+        const gA = dark ? 0.22 : 0.14;
+
+        atom.orbits.forEach(orb => {
+          ctx.save();
+          ctx.translate(cx, cy); ctx.rotate(orb.tilt); ctx.scale(1, 0.40);
+          ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2);
+          ctx.strokeStyle = C[orb.color] + oA + ')'; ctx.lineWidth = 0.8; ctx.stroke();
+          ctx.restore();
+        });
+
+        const pulse = Math.sin(t * 0.00075 + atom.nucleusPulse) * 0.25 + 0.75;
+        const nR = r * 0.15 * pulse;
+        const nG = ctx.createRadialGradient(cx, cy, 0, cx, cy, nR * 2.8);
+        nG.addColorStop(0,   C[0] + nA + ')');
+        nG.addColorStop(0.6, C[1] + (nA * 0.35) + ')');
+        nG.addColorStop(1,   C[0] + '0)');
+        ctx.beginPath(); ctx.arc(cx, cy, nR * 2.8, 0, Math.PI * 2);
+        ctx.fillStyle = nG; ctx.fill();
+        ctx.beginPath(); ctx.arc(cx, cy, nR, 0, Math.PI * 2);
+        ctx.fillStyle = C[0] + nA + ')'; ctx.fill();
+
+        atom.orbits.forEach((orb, oi) => {
+          const pos = ePos(atom, orb);
+          orb.trail.forEach((tp, ti) => {
+            const a = (ti / TRAIL) * gA * 0.6;
+            const sz = orb.eRad * 0.25 * (ti / TRAIL);
+            ctx.beginPath(); ctx.arc(tp.x, tp.y, sz, 0, Math.PI * 2);
+            ctx.fillStyle = C[oi % 3] + a + ')'; ctx.fill();
+          });
+          const eG = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, orb.eRad * 4);
+          eG.addColorStop(0, C[oi % 3] + gA + ')');
+          eG.addColorStop(1, C[oi % 3] + '0)');
+          ctx.beginPath(); ctx.arc(pos.x, pos.y, orb.eRad * 4, 0, Math.PI * 2);
+          ctx.fillStyle = eG; ctx.fill();
+          ctx.beginPath(); ctx.arc(pos.x, pos.y, orb.eRad, 0, Math.PI * 2);
+          ctx.fillStyle = C[oi % 3] + eA + ')'; ctx.fill();
+        });
+      }
+
+      let lastTime = 0;
+      function loop(ts) {
+        const dt = Math.min(ts - lastTime, 48); lastTime = ts;
+        ctx.clearRect(0, 0, W, H);
+        const dark = isDark();
+        atoms.forEach(a => {
+          a.x += a.drift.vx * dt; a.y += a.drift.vy * dt;
+          if (a.x < 0.05 || a.x > 0.95) a.drift.vx *= -1;
+          if (a.y < 0.05 || a.y > 0.95) a.drift.vy *= -1;
+          a.orbits.forEach(orb => {
+            const p = ePos(a, orb);
+            orb.trail.push({ x: p.x, y: p.y });
+            if (orb.trail.length > TRAIL) orb.trail.shift();
+            orb.angle += orb.speed * dt * 0.001;
+          });
+          drawAtom(a, ts, dark);
+        });
+        requestAnimationFrame(loop);
+      }
+      requestAnimationFrame(ts => { lastTime = ts; loop(ts); });
+    })();
     </script>
 </body>
 
